@@ -9,14 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Deploy to FC
-      uses: aliyun/fc-deploy-action@v1.3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
       with:
-        access-key-id: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
-        access-key-secret: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
-        region: cn-hangzhou
-        service-name: math-score
-        function-name: api
-        code-dir: backend
-        handler: index.handler
-        runtime: python3.10
+        python-version: '3.12'
+    
+    - name: Install Aliyun CLI
+      run: |
+        pip install aliyun-python-sdk-fc aliyun-python-sdk-core
+    
+    - name: Deploy to FC
+      env:
+        ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+        ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+        REGION: cn-hangzhou
+      run: |
+        python deploy_fc.py
