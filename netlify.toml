@@ -1,0 +1,10 @@
+# Netlify Configuration
+[build]
+  publish = "frontend"
+  command = ""
+
+[[redirects]]
+  from = "/api/*"
+  to = "http://localhost:8808/api/:splat"
+  status = 200
+  force = true
