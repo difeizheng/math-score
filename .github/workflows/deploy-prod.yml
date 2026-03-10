@@ -1,0 +1,25 @@
+name: Production Deploy
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install requests
+      run: pip install requests
+    - name: Deploy to Aliyun
+      env:
+        ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+        ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+        ALIYUN_REGION: cn-hangzhou
+        FC_SERVICE_NAME: math-score
+        FC_FUNCTION_NAME: api
+      run: python deploy_to_aliyun.py
