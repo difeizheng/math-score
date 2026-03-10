@@ -15,14 +15,15 @@ jobs:
       with:
         python-version: '3.12'
     
-    - name: Install Aliyun CLI
+    - name: Install dependencies
       run: |
-        pip install aliyun-python-sdk-fc aliyun-python-sdk-core
+        cd backend
+        pip install -r requirements.txt -t .
     
-    - name: Deploy to FC
-      env:
-        ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
-        ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
-        REGION: cn-hangzhou
-      run: |
-        python deploy_fc.py
+    - name: Deploy using CLI
+      uses: aliyun/aliyun-cli-action@v1
+      with:
+        access_key_id: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+        access_key_secret: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+        region: cn-hangzhou
+        command: fc function deploy --service-name math-score --function-name api --code-dir backend
