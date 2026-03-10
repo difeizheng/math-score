@@ -1,0 +1,47 @@
+name: Full Deploy to Aliyun FC
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Package backend code
+      run: |
+        cd backend
+        pip install -r requirements.txt -t . || echo "No requirements.txt"
+        touch __init__.py
+        cd ..
+    
+    - name: Deploy to Aliyun FC
+      env:
+        ALIYUN_ACCESS_KEY_ID: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+        ALIYUN_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+        ALIYUN_REGION: cn-hangzhou
+        FC_SERVICE_NAME: math-score
+        FC_FUNCTION_NAME: api
+      run: |
+        echo "Starting deployment..."
+        python deploy_fc_full.py
+    
+    - name: Deployment Summary
+      run: |
+        echo "========================================"
+        echo "  DEPLOYMENT COMPLETE"
+        echo "========================================"
