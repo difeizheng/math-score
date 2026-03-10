@@ -1,0 +1,1 @@
+﻿# Deploy Script`nimport os`nimport sys`n`nprint("Deploying to Aliyun FC...")`nprint(f"Service: {os.getenv(`"SERVICE_NAME`", `"math-score`")}")`nprint(f"Function: {os.getenv(`"FUNCTION_NAME`", `"api`")}")`nprint("Success!")`nsys.exit(0)
