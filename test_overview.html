@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Overview Data</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #667eea; }
+        pre { background: #f0f0f0; padding: 15px; border-radius: 8px; overflow-x: auto; }
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧪 概览数据测试</h1>
+        <div id="status">正在加载...</div>
+    </div>
+    
+    <div class="card">
+        <h2>API 响应数据</h2>
+        <pre id="responseData">Loading...</pre>
+    </div>
+    
+    <div class="card">
+        <h2>数据分析</h2>
+        <div id="analysis"></div>
+    </div>
+    
+    <script>
+        const API = 'http://localhost:8808/api';
+        
+        async function test() {
+            const status = document.getElementById('status');
+            const responsePre = document.getElementById('responseData');
+            const analysisDiv = document.getElementById('analysis');
+            
+            try {
+                status.innerHTML = '正在请求 API...';
+                const res = await fetch(`${API}/analysis/overview`);
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+                
+                const data = await res.json();
+                
+                // 显示原始数据（前 500 字符）
+                responsePre.textContent = JSON.stringify(data, null, 2).substring(0, 500) + '...';
+                
+                // 分析数据
+                let html = '<ul>';
+                html += `<li>学生总数：<strong>${data.basic_stats?.total_students || 0}</strong></li>`;
+                html += `<li>考试次数：<strong>${data.basic_stats?.total_exams || 0}</strong></li>`;
+                html += `<li>成绩记录：<strong>${data.basic_stats?.total_records || 0}</strong></li>`;
+                html += `<li>平均分趋势数据：<strong>${data.avg_trend?.length || 0} 条</strong></li>`;
+                html += `<li>分数段分布数据：<strong>${data.score_distribution?.length || 0} 条</strong></li>`;
+                
+                if (data.avg_trend && data.avg_trend.length > 0) {
+                    html += '<li style="margin-top:10px;"><strong>平均分趋势示例（前 3 条）:</strong></li><ul>';
+                    data.avg_trend.slice(0, 3).forEach(item => {
+                        html += `<li>${item.exam_name}: ${item.avg_score.toFixed(1)}分 (${item.student_count}人)</li>`;
+                    });
+                    html += '</ul>';
+                }
+                
+                if (data.score_distribution && data.score_distribution.length > 0) {
+                    html += '<li style="margin-top:10px;"><strong>分数段分布:</strong></li><ul>';
+                    data.score_distribution.forEach(item => {
+                        html += `<li>${item.level}: ${item.count}人</li>`;
+                    });
+                    html += '</ul>';
+                }
+                
+                html += '</ul>';
+                analysisDiv.innerHTML = html;
+                
+                status.innerHTML = '<span class="success">✅ 数据加载成功！</span>';
+                
+                // 检查潜在问题
+                const issues = [];
+                if (!data.avg_trend || data.avg_trend.length === 0) {
+                    issues.push('⚠️ 平均分趋势数据为空');
+                }
+                if (!data.score_distribution || data.score_distribution.length === 0) {
+                    issues.push('⚠️ 分数段分布数据为空');
+                }
+                if (data.avg_trend && data.avg_trend.some(item => !item.exam_name || !item.avg_score)) {
+                    issues.push('⚠️ 平均分趋势数据格式有问题');
+                }
+                
+                if (issues.length > 0) {
+                    status.innerHTML += '<br><br><strong>潜在问题:</strong><br>' + issues.join('<br>');
+                }
+                
+            } catch (e) {
+                status.innerHTML = `<span class="error">❌ 错误：${e.message}</span>`;
+                responsePre.textContent = e.stack;
+                console.error(e);
+            }
+        }
+        
+        test();
+    </script>
+</body>
+</html>

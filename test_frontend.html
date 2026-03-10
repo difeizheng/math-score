@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Frontend</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .card { background: white; padding: 20px; margin: 10px 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #667eea; }
+        .stat { display: inline-block; margin: 10px; padding: 15px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 8px; }
+        .stat .num { font-size: 2em; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: #f0f0f0; }
+        .loading { text-align: center; padding: 40px; color: #666; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>🧪 前端测试页面</h1>
+        
+        <div class="card">
+            <h2>API 连接测试</h2>
+            <div id="status">Testing...</div>
+        </div>
+        
+        <div class="card" id="studentCard" style="display:none;">
+            <h2>茗心的成绩数据</h2>
+            <div id="stats"></div>
+            <table id="scoreTable">
+                <thead>
+                    <tr>
+                        <th>考试名称</th>
+                        <th>学期</th>
+                        <th>分数</th>
+                        <th>变化</th>
+                        <th>趋势</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreBody"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        const API = 'http://localhost:8808/api';
+        
+        async function test() {
+            const status = document.getElementById('status');
+            
+            try {
+                // Test 1: Overview
+                status.innerHTML = '1. Testing overview API...';
+                const overviewRes = await fetch(`${API}/analysis/overview`);
+                const overview = await overviewRes.json();
+                status.innerHTML += `<br>✅ Overview: ${overview.basic_stats.total_students} students, ${overview.basic_stats.total_records} records`;
+                
+                // Test 2: Students
+                status.innerHTML += '<br>2. Testing students API...';
+                const studentsRes = await fetch(`${API}/students`);
+                const students = await studentsRes.json();
+                status.innerHTML += `<br>✅ Students: ${students.length} students`;
+                
+                // Find 茗心 (student_id: 3)
+                const mingxin = students.find(s => s.student_id === '3');
+                if (mingxin) {
+                    status.innerHTML += `<br>✅ 茗心 found: ${mingxin.student_name}`;
+                    
+                    // Test 3: Student trend
+                    status.innerHTML += '<br>3. Testing student trend API...';
+                    const trendRes = await fetch(`${API}/analysis/student/3/trend`);
+                    const trend = await trendRes.json();
+                    
+                    if (trend.score_trend) {
+                        status.innerHTML += `<br>✅ Trend: ${trend.score_trend.length} records`;
+                        
+                        // Show stats
+                        document.getElementById('studentCard').style.display = 'block';
+                        document.getElementById('stats').innerHTML = `
+                            <div class="stat">
+                                <div class="num">${trend.summary.avg_score.toFixed(1)}</div>
+                                <div>平均分</div>
+                            </div>
+                            <div class="stat">
+                                <div class="num">${trend.summary.max_score}</div>
+                                <div>最高分</div>
+                            </div>
+                            <div class="stat">
+                                <div class="num">${trend.summary.min_score}</div>
+                                <div>最低分</div>
+                            </div>
+                            <div class="stat">
+                                <div class="num">${trend.summary.total_exams}</div>
+                                <div>考试次数</div>
+                            </div>
+                        `;
+                        
+                        // Show table (last 20 records)
+                        const tbody = document.getElementById('scoreBody');
+                        const recentScores = trend.score_trend.slice(-20);
+                        tbody.innerHTML = recentScores.map(s => `
+                            <tr>
+                                <td>${s.exam_name}</td>
+                                <td>${s.semester}</td>
+                                <td><strong>${s.score}</strong></td>
+                                <td>${s.score_change ? (s.score_change > 0 ? '+' : '') + s.score_change.toFixed(1) : '-'}</td>
+                                <td>${s.trend || '-'}</td>
+                            </tr>
+                        `).join('');
+                        
+                        status.innerHTML += '<br>✅ Data displayed successfully!';
+                    } else {
+                        status.innerHTML += '<br>❌ No score_trend data';
+                    }
+                } else {
+                    status.innerHTML += '<br>❌ 茗心 not found';
+                }
+                
+            } catch (e) {
+                status.innerHTML = `❌ Error: ${e.message}`;
+                console.error(e);
+            }
+        }
+        
+        test();
+    </script>
+</body>
+</html>

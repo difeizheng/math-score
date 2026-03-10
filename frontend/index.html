@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 茗心的数学成长乐园 🌟</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-pink: #FFB6C1;
+            --primary-blue: #87CEEB;
+            --accent-yellow: #FFD700;
+            --success-green: #98FB98;
+            --warning-orange: #FFA07A;
+            --background: #F8F9FF;
+            --card-bg: #FFFFFF;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #F8F9FF 0%, #FFE4F0 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4);
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before { content: '🌈'; position: absolute; top: 10px; left: 20px; font-size: 3em; animation: float 3s ease-in-out infinite; }
+        .header::after { content: '🌈'; position: absolute; top: 10px; right: 20px; font-size: 3em; animation: float 3s ease-in-out infinite reverse; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .header h1 { color: white; font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .header p { color: white; font-size: 1.2em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(255, 182, 193, 0.3);
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 182, 193, 0.5); }
+        .card.pink { border-color: var(--primary-pink); }
+        .card.blue { border-color: var(--primary-blue); }
+        .card.yellow { border-color: var(--accent-yellow); }
+        .card h2 { color: #667eea; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px dashed var(--primary-pink); display: flex; align-items: center; gap: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card {
+            background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before { content: '✨'; position: absolute; top: 5px; right: 10px; font-size: 1.5em; }
+        .stat-card .number { font-size: 2.5em; font-weight: bold; margin-bottom: 5px; }
+        .stat-card .label { font-size: 0.95em; opacity: 0.95; }
+        .chart-container { width: 100%; height: 400px; }
+        .upload-area {
+            border: 3px dashed var(--primary-pink);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #FFF5F8 0%, #F0F8FF 100%);
+        }
+        .upload-area:hover { background: linear-gradient(135deg, #FFE4F0 0%, #E0F0FF 100%); border-color: var(--primary-blue); transform: scale(1.02); }
+        .upload-area.dragover { background: linear-gradient(135deg, #FFE4F0 0%, #E0F0FF 100%); border-color: var(--primary-blue); }
+        .upload-icon { font-size: 4em; margin-bottom: 15px; }
+        .btn {
+            background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 182, 193, 0.6); }
+        .btn-small { padding: 8px 20px; font-size: 0.9em; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; border-radius: 15px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: linear-gradient(135deg, #FFE4F0 0%, #E0F0FF 100%); color: #667eea; font-weight: bold; }
+        tr:hover { background: #FFF5F8; }
+        .trend-up { color: #10b981; font-weight: bold; }
+        .trend-down { color: #ef4444; font-weight: bold; }
+        .trend-stable { color: #6b7280; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .tab {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid var(--primary-pink);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab:hover { background: var(--primary-pink); color: white; transform: translateY(-2px); }
+        .tab.active { background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4); }
+        .alert { padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .alert-success { background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); color: #065f46; border: 2px solid #10b981; }
+        .alert-error { background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); color: #991b1b; border: 2px solid #ef4444; }
+        .loading { text-align: center; padding: 40px; color: #667eea; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #FFB6C1; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .student-select { width: 100%; padding: 12px 15px; border: 2px solid var(--primary-pink); border-radius: 15px; font-size: 1em; margin-bottom: 15px; background: white; }
+        .student-select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 10px rgba(135, 206, 235, 0.3); }
+        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-top: 20px; }
+        .achievement-card { background: linear-gradient(135deg, #FFF5F8 0%, #F0F8FF 100%); border: 3px solid var(--primary-pink); border-radius: 20px; padding: 20px; text-align: center; transition: all 0.3s; position: relative; }
+        .achievement-card:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255, 182, 193, 0.4); }
+        .achievement-card.locked { opacity: 0.5; filter: grayscale(0.8); }
+        .achievement-icon { font-size: 3em; margin-bottom: 10px; }
+        .achievement-name { font-weight: bold; color: #667eea; margin-bottom: 5px; }
+        .achievement-desc { font-size: 0.85em; color: #666; }
+        .achievement-card.earned::after { content: '✅'; position: absolute; top: 10px; right: 10px; font-size: 1.5em; }
+        .goal-setting { background: linear-gradient(135deg, #FFF5F8 0%, #F0F8FF 100%); border: 3px dashed var(--primary-blue); border-radius: 20px; padding: 25px; margin-top: 20px; }
+        .goal-input-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .goal-input { padding: 12px; border: 2px solid var(--primary-pink); border-radius: 12px; font-size: 1em; }
+        .goal-input:focus { outline: none; border-color: var(--primary-blue); }
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; padding: 10px 25px; border-radius: 50px; box-shadow: 0 5px 25px rgba(255, 182, 193, 0.5); z-index: 1000; }
+        .points-display { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: white; padding: 15px 25px; border-radius: 20px; display: inline-flex; align-items: center; gap: 10px; font-size: 1.2em; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+        .print-mode .tabs, .print-mode .upload-area, .print-mode .btn, .print-mode .bottom-nav { display: none !important; }
+        .kids-view .stat-card .number { font-size: 3em; }
+        .kids-view .card h2 { font-size: 1.5em; }
+        .kids-view table { font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div id="app" :class="{ 'print-mode': printMode, 'kids-view': kidsView }">
+        <div class="container">
+            <div class="header">
+                <h1>🌟 茗心的数学成长乐园 🌟</h1>
+                <p>每一次进步，都值得被看见！✨</p>
+                <p class="subtitle">📚 快乐学习 · 健康成长 📚</p>
+            </div>
+            
+            <div class="card no-print">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <button class="btn btn-small" @click="kidsView = !kidsView">{{ kidsView ? '👧 儿童视图' : '👨‍💼 成人视图' }}</button>
+                        <button class="btn btn-small" @click="printMode = !printMode">{{ printMode ? '❌ 退出打印' : '🖨️ 打印模式' }}</button>
+                        <a href="advanced.html" class="btn btn-small">🎯 宏观分析</a>
+                    </div>
+                    <div class="points-display" v-if="totalPoints > 0">
+                        <span class="points-icon">🌟</span>
+                        <span>积分：{{ totalPoints }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card pink no-print" v-if="currentTab === 'import'">
+                <h2>📁 数据导入</h2>
+                <div class="upload-area" @dragover.prevent="dragover = true" @dragleave.prevent="dragover = false" @drop.prevent="handleDrop" @click="$refs.fileInput.click()" :class="{dragover: dragover}">
+                    <div class="upload-icon">📤</div>
+                    <p style="font-size: 1.2em; margin-bottom: 10px;">拖拽 Excel 文件到此处，或点击上传</p>
+                    <p style="color: #666; font-size: 0.9em;">支持的列：学号、姓名、班级、考试名称、考试日期、成绩、满分、排名</p>
+                    <input type="file" ref="fileInput" accept=".xlsx,.xls,.csv" @change="handleFileSelect" style="display: none" />
+                </div>
+                <div v-if="uploadMessage" :class="['alert', uploadSuccess ? 'alert-success' : 'alert-error']">
+                    <span style="font-size: 1.5em;">{{ uploadSuccess ? '✅' : '❌' }}</span>
+                    <span>{{ uploadMessage }}</span>
+                </div>
+                <div v-if="uploading" class="loading"><div class="spinner"></div><p>正在导入数据... 📊</p></div>
+            </div>
+            
+            <div class="card blue" v-if="currentTab === 'overview'">
+                <h2>📈 整体概览</h2>
+                <div v-if="loading" class="loading"><div class="spinner"></div><p>加载中... ⏳</p></div>
+                <template v-else>
+                    <div style="background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%); padding: 25px; border-radius: 20px; margin-bottom: 25px; text-align: center; color: white; position: relative; overflow: hidden;">
+                        <div style="font-size: 3em; position: absolute; top: -10px; left: 20px; opacity: 0.3;">🎓</div>
+                        <div style="font-size: 3em; position: absolute; top: -10px; right: 20px; opacity: 0.3;">📚</div>
+                        <h3 style="font-size: 1.8em; margin-bottom: 10px; position: relative;">✨ 欢迎来到数学成绩分析系统 ✨</h3>
+                        <p style="font-size: 1.1em; opacity: 0.95; position: relative;">已收录 {{ overview.basic_stats?.total_students || 0 }} 位同学的 {{ overview.basic_stats?.total_records || 0 }} 条成长记录</p>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #FFB6C1, #FF69B4);">
+                            <div style="font-size: 2.5em; margin-bottom: 5px;">👨‍🎓</div>
+                            <div class="number">{{ overview.basic_stats?.total_students || 0 }}</div>
+                            <div class="label">学生总数</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #87CEEB, #4169E1);">
+                            <div style="font-size: 2.5em; margin-bottom: 5px;">📝</div>
+                            <div class="number">{{ overview.basic_stats?.total_exams || 0 }}</div>
+                            <div class="label">考试次数</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #98FB98, #32CD32);">
+                            <div style="font-size: 2.5em; margin-bottom: 5px;">📊</div>
+                            <div class="number">{{ overview.basic_stats?.total_records || 0 }}</div>
+                            <div class="label">成绩记录</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
+                            <div style="font-size: 2.5em; margin-bottom: 5px;">🏆</div>
+                            <div class="number">{{ Math.round((overview.basic_stats?.total_records || 0) / (overview.basic_stats?.total_students || 1)) }}</div>
+                            <div class="label">人均考试</div>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; margin-top: 25px;">
+                        <div style="background: white; padding: 20px; border-radius: 20px; border: 3px solid #FFB6C1;"><div id="avgTrendChart" style="height: 350px;"></div></div>
+                        <div style="background: white; padding: 20px; border-radius: 20px; border: 3px solid #87CEEB;"><div id="scoreDistChart" style="height: 350px;"></div></div>
+                    </div>
+                    <div style="margin-top: 25px; padding: 20px; background: linear-gradient(135deg, #FFF5F8, #F0F8FF); border-radius: 20px; border: 3px dashed #FFB6C1;">
+                        <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; color: #667eea;"><span style="font-size: 1.5em;">🎯</span> 分数段分布详情</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                            <div v-for="(dist, index) in overview.score_distribution" :key="index" style="padding: 15px; background: white; border-radius: 15px; text-align: center; border-left: 5px solid;" :style="{borderLeftColor: getDistColor(index)}">
+                                <div style="font-size: 2em; margin-bottom: 5px;">{{ getDistEmoji(index) }}</div>
+                                <div style="font-weight: bold; color: #667eea; margin-bottom: 5px; font-size: 0.85em;">{{ dist.level }}</div>
+                                <div style="font-size: 1.8em; font-weight: bold; color: #333;">{{ dist.count }}</div>
+                                <div style="font-size: 0.85em; color: #999;">人</div>
+                                <div style="margin-top: 10px; background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                    <div style="height: 100%; background: linear-gradient(90deg, #FFB6C1, #87CEEB); transition: width 0.5s;" :style="{width: Math.min(100, (dist.count / (overview.basic_stats?.total_records || 1)) * 100 * 5) + '%'}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            <div class="card yellow" v-if="currentTab === 'student'">
+                <h2>👧 茗心的成长轨迹</h2>
+                
+                <!-- 学期筛选 -->
+                <div style="margin-bottom: 15px; padding: 15px; background: #f8f9ff; border-radius: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <span style="font-weight: bold; color: #667eea;">📅 学期筛选：</span>
+                        <label v-for="sem in availableSemesters" :key="sem" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; background: white; border-radius: 20px; border: 2px solid #FFB6C1; cursor: pointer;">
+                            <input type="checkbox" :value="sem" v-model="selectedSemesters" @change="filterBySemester" style="accent-color: #FFB6C1;" />
+                            <span style="font-size: 0.9em;">{{ sem }}</span>
+                        </label>
+                        <button class="btn btn-small" @click="selectAllSemesters" style="margin-left: 10px;">全选</button>
+                        <button class="btn btn-small" @click="resetSemesters" style="background: #f0f0f0;">重置</button>
+                    </div>
+                </div>
+                
+                <select v-model="selectedStudent" @change="loadStudentAnalysis" class="student-select">
+                    <option value="">选择学生...</option>
+                    <option v-for="student in students" :key="student.student_id" :value="student.student_id">{{ student.student_name }} ({{ student.class_name }})</option>
+                </select>
+                <div v-if="studentData.student_info?.student_name">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="number">{{ studentData.summary?.avg_score?.toFixed(1) || '-' }}</div><div class="label">📊 平均分</div></div>
+                        <div class="stat-card"><div class="number">{{ studentData.summary?.max_score || '-' }}</div><div class="label">🏆 最高分</div></div>
+                        <div class="stat-card"><div class="number">{{ studentData.summary?.min_score || '-' }}</div><div class="label">📈 最低分</div></div>
+                        <div class="stat-card"><div class="number">{{ studentData.summary?.total_exams || 0 }}</div><div class="label">📝 考试次数</div></div>
+                    </div>
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><span>🏆</span> 成就徽章</h3>
+                    <div class="achievement-grid">
+                        <div v-for="achievement in achievements" :key="achievement.id" class="achievement-card" :class="{ earned: achievement.earned, locked: !achievement.earned }">
+                            <div class="achievement-icon">{{ achievement.icon }}</div>
+                            <div class="achievement-name">{{ achievement.name }}</div>
+                            <div class="achievement-desc">{{ achievement.desc }}</div>
+                        </div>
+                    </div>
+                    <div class="goal-setting">
+                        <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;"><span>🎯</span> 我的学习目标</h3>
+                        <div class="goal-input-group">
+                            <input type="number" v-model="goal.targetScore" placeholder="目标分数" class="goal-input" min="0" max="100" />
+                            <input type="text" v-model="goal.reward" placeholder="达成奖励（如：冰淇淋🍦）" class="goal-input" />
+                            <button class="btn" @click="saveGoal">💾 保存目标</button>
+                        </div>
+                        <div v-if="goal.saved" class="alert alert-success"><span>✅ 目标已保存！加油哦～💪</span></div>
+                    </div>
+                    <div id="studentTrendChart" class="chart-container"></div>
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><span>📋</span> 成绩详情</h3>
+                    <table>
+                        <thead><tr><th>考试名称</th><th>日期</th><th>成绩</th><th>变化</th><th>趋势</th></tr></thead>
+                        <tbody>
+                            <tr v-for="score in studentData.score_trend" :key="score.id">
+                                <td>{{ score.exam_name }}</td>
+                                <td>{{ score.exam_date }}</td>
+                                <td><strong>{{ score.score }}</strong></td>
+                                <td :class="getTrendClass(score.score_change)">{{ formatChange(score.score_change) }}</td>
+                                <td :class="getTrendClass(score.score_change)">{{ score.trend || '-' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card pink" v-if="currentTab === 'class'">
+                <h2>🏫 班级分析</h2>
+                
+                <select v-model="selectedClass" @change="loadClassAnalysis" class="student-select">
+                    <option value="">选择班级...</option>
+                    <option v-for="cls in classList" :key="cls" :value="cls">{{ cls }}</option>
+                </select>
+                
+                <!-- 学期筛选 -->
+                <div v-if="classAvailableSemesters.length > 0" style="margin-bottom: 15px; padding: 15px; background: #f8f9ff; border-radius: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <span style="font-weight: bold; color: #667eea;">📅 学期筛选：</span>
+                        <label v-for="sem in classAvailableSemesters" :key="sem" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; background: white; border-radius: 20px; border: 2px solid #FFB6C1; cursor: pointer;">
+                            <input type="checkbox" :value="sem" v-model="classSelectedSemesters" @change="filterClassBySemester" style="accent-color: #FFB6C1;" />
+                            <span style="font-size: 0.9em;">{{ sem }}</span>
+                        </label>
+                        <button class="btn btn-small" @click="selectAllClassSemesters" style="margin-left: 10px;">全选</button>
+                        <button class="btn btn-small" @click="resetClassSemesters" style="background: #f0f0f0;">重置</button>
+                    </div>
+                </div>
+                
+                <div v-if="classData.class_name">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="number">{{ classData.student_count }}</div><div class="label">👥 班级人数</div></div>
+                        <div class="stat-card"><div class="number">{{ classData.exam_stats?.[0]?.avg_score?.toFixed(1) || '-' }}</div><div class="label">📊 最新平均分</div></div>
+                    </div>
+                    <div id="classExamChart" class="chart-container"></div>
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;"><span>📋</span> 学生列表</h3>
+                    <div style="margin-bottom: 10px; color: #666; font-size: 0.9em;">
+                        显示 {{ classSelectedSemesters.length }}/{{ classAvailableSemesters.length }} 个学期的数据，共 {{ classData.students?.length || 0 }} 位同学
+                    </div>
+                    <table><thead><tr><th>学号</th><th>姓名</th></tr></thead><tbody><tr v-for="student in classData.students" :key="student.student_id"><td>{{ student.student_id }}</td><td>{{ student.student_name }}</td></tr></tbody></table>
+                </div>
+            </div>
+            
+            <div class="bottom-nav no-print">
+                <div class="tabs" style="margin-bottom: 0;">
+                    <button class="tab" :class="{active: currentTab === 'import'}" @click="currentTab = 'import'">📁 导入</button>
+                    <button class="tab" :class="{active: currentTab === 'overview'}" @click="currentTab = 'overview'">📈 概览</button>
+                    <button class="tab" :class="{active: currentTab === 'student'}" @click="currentTab = 'student'">👧 茗心</button>
+                    <button class="tab" :class="{active: currentTab === 'class'}" @click="currentTab = 'class'">🏫 班级</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const { createApp } = Vue;
+        // 使用环境变量（部署时自动替换）或本地地址
+        const API_BASE = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8808/api' 
+            : (window.API_BASE_URL || '/api');
+        
+        createApp({
+            data() {
+                return {
+                    currentTab: 'overview',
+                    dragover: false,
+                    uploading: false,
+                    uploadMessage: '',
+                    uploadSuccess: false,
+                    loading: false,
+                    overview: { basic_stats: {}, score_distribution: [] },
+                    students: [],
+                    classList: [],
+                    selectedClass: '',
+                    classData: {},
+                    classAvailableSemesters: [],
+                    classSelectedSemesters: [],
+                    classAllScores: [],
+                    selectedStudent: '',
+                    studentData: {},
+                    printMode: false,
+                    kidsView: true,
+                    totalPoints: 0,
+                    goal: { targetScore: '', reward: '', saved: false },
+                    availableSemesters: [],
+                    selectedSemesters: [],
+                    allScores: [],
+                    achievements: [
+                        { id: 1, name: '🌟 进步之星', desc: '连续 3 次进步', icon: '⭐', earned: false },
+                        { id: 2, name: '📚 学习达人', desc: '平均分 90+', icon: '📖', earned: false },
+                        { id: 3, name: '🎯 目标达成', desc: '达成自定目标', icon: '🎯', earned: false },
+                        { id: 4, name: '💪 努力奖', desc: '成绩下降但努力了', icon: '💪', earned: false },
+                        { id: 5, name: '🏃 坚持奖', desc: '连续记录 10 次考试', icon: '🏅', earned: false }
+                    ]
+                }
+            },
+            mounted() {
+                this.loadData();
+            },
+            methods: {
+                async loadData() {
+                    await this.loadStudents();
+                    await this.loadOverview();
+                },
+                async loadStudents() {
+                    try {
+                        const res = await fetch(`${API_BASE}/students`);
+                        const data = await res.json();
+                        // 按学号数字大小排序（转换为整数比较）
+                        this.students = data.sort((a, b) => {
+                            // 转换为浮点数后取整，确保 "1.0" 和 "1" 都视为 1
+                            const idA = Math.floor(parseFloat(a.student_id) || 0);
+                            const idB = Math.floor(parseFloat(b.student_id) || 0);
+                            return idA - idB;
+                        });
+                        this.classList = [...new Set(data.map(s => s.class_name).filter(Boolean))];
+                        const mingxin = data.find(s => s.student_name && s.student_name.includes('茗心'));
+                        if (mingxin) {
+                            this.selectedStudent = mingxin.student_id;
+                            // 延迟加载确保 DOM 就绪
+                            setTimeout(() => {
+                                this.loadStudentAnalysis();
+                            }, 500);
+                        }
+                    } catch (e) { console.error('加载学生失败:', e); }
+                },
+                async loadOverview() {
+                    this.loading = true;
+                    try {
+                        const res = await fetch(`${API_BASE}/analysis/overview`);
+                        this.overview = await res.json();
+                        console.log('Overview data loaded:', this.overview);
+                        
+                        // 确保数据有效
+                        if (!this.overview.avg_trend) this.overview.avg_trend = [];
+                        if (!this.overview.score_distribution) this.overview.score_distribution = [];
+                        
+                        // 延迟渲染确保 DOM 已就绪
+                        setTimeout(() => {
+                            this.renderAvgTrendChart();
+                            this.renderScoreDistChart();
+                        }, 300);
+                    } catch (e) { 
+                        console.error('加载概览失败:', e);
+                        alert('加载数据失败，请刷新页面重试');
+                    }
+                    finally { this.loading = false; }
+                },
+                async loadStudentAnalysis() {
+                    if (!this.selectedStudent) return;
+                    try {
+                        const res = await fetch(`${API_BASE}/analysis/student/${this.selectedStudent}/trend`);
+                        const data = await res.json();
+                        this.studentData = data;
+                        this.allScores = data.score_trend || [];
+                        
+                        // 提取学期列表
+                        const semesters = [...new Set(this.allScores.map(s => s.semester).filter(Boolean))];
+                        this.availableSemesters = semesters;
+                        this.selectedSemesters = [...semesters]; // 默认全选
+                        
+                        this.calculateAchievements();
+                        this.$nextTick(() => { 
+                            this.filterBySemester(); // 应用筛选并渲染图表
+                        });
+                    } catch (e) { console.error('加载学生分析失败:', e); }
+                },
+                filterBySemester() {
+                    if (this.selectedSemesters.length === 0 || this.selectedSemesters.length === this.availableSemesters.length) {
+                        // 全选或全不选时显示所有数据
+                        this.studentData.score_trend = this.allScores;
+                    } else {
+                        // 筛选显示的学期
+                        this.studentData.score_trend = this.allScores.filter(s => 
+                            this.selectedSemesters.includes(s.semester)
+                        );
+                    }
+                    this.$nextTick(() => { this.renderStudentTrendChart(); });
+                },
+                selectAllSemesters() {
+                    this.selectedSemesters = [...this.availableSemesters];
+                    this.filterBySemester();
+                },
+                resetSemesters() {
+                    this.selectedSemesters = [...this.availableSemesters];
+                    this.filterBySemester();
+                },
+                async loadClassAnalysis() {
+                    if (!this.selectedClass) return;
+                    try {
+                        const res = await fetch(`${API_BASE}/analysis/class/${encodeURIComponent(this.selectedClass)}`);
+                        this.classData = await res.json();
+                        this.classAllScores = this.classData.all_scores || [];
+                        
+                        // 提取学期列表
+                        const semesters = [...new Set(this.classAllScores.map(s => s.semester).filter(Boolean))];
+                        this.classAvailableSemesters = semesters;
+                        this.classSelectedSemesters = [...semesters]; // 默认全选
+                        
+                        this.$nextTick(() => { 
+                            this.filterClassBySemester();
+                        });
+                    } catch (e) { console.error('加载班级分析失败:', e); }
+                },
+                filterClassBySemester() {
+                    if (this.classSelectedSemesters.length === 0 || this.classSelectedSemesters.length === this.classAvailableSemesters.length) {
+                        // 全选或全不选时显示所有数据
+                        this.classData.all_scores = this.classAllScores;
+                    } else {
+                        // 筛选显示的学期
+                        this.classData.all_scores = this.classAllScores.filter(s => 
+                            this.classSelectedSemesters.includes(s.semester)
+                        );
+                    }
+                    // 重新计算考试统计
+                    this.calculateClassExamStats();
+                    this.$nextTick(() => { this.renderClassExamChart(); });
+                },
+                selectAllClassSemesters() {
+                    this.classSelectedSemesters = [...this.classAvailableSemesters];
+                    this.filterClassBySemester();
+                },
+                resetClassSemesters() {
+                    this.classSelectedSemesters = [...this.classAvailableSemesters];
+                    this.filterClassBySemester();
+                },
+                calculateClassExamStats() {
+                    // 根据筛选后的成绩重新计算考试统计
+                    const scoresByExam = {};
+                    this.classData.all_scores.forEach(score => {
+                        if (!scoresByExam[score.exam_name]) {
+                            scoresByExam[score.exam_name] = [];
+                        }
+                        scoresByExam[score.exam_name].push(score.score);
+                    });
+                    
+                    this.classData.exam_stats = Object.keys(scoresByExam).map(examName => {
+                        const scores = scoresByExam[examName];
+                        return {
+                            exam_name: examName,
+                            exam_date: this.classData.all_scores.find(s => s.exam_name === examName)?.exam_date || '',
+                            avg_score: scores.reduce((a, b) => a + b, 0) / scores.length,
+                            max_score: Math.max(...scores),
+                            min_score: Math.min(...scores),
+                            student_count: scores.length
+                        };
+                    }).sort((a, b) => a.exam_name.localeCompare(b.exam_name));
+                },
+                handleFileSelect(event) { const file = event.target.files[0]; if (file) this.uploadFile(file); },
+                handleDrop(event) { this.dragover = false; const file = event.dataTransfer.files[0]; if (file) this.uploadFile(file); },
+                async uploadFile(file) {
+                    this.uploading = true;
+                    this.uploadMessage = '';
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    try {
+                        const res = await fetch(`${API_BASE}/import/excel`, { method: 'POST', body: formData });
+                        const data = await res.json();
+                        if (res.ok) {
+                            this.uploadSuccess = true;
+                            this.uploadMessage = `✅ 成功导入 ${data.imported_count} 条成绩记录！`;
+                            this.loadData();
+                            this.currentTab = 'overview';
+                        } else { throw new Error(data.detail || '导入失败'); }
+                    } catch (e) { this.uploadSuccess = false; this.uploadMessage = `❌ 导入失败：${e.message}`; }
+                    finally { this.uploading = false; }
+                },
+                getTrendClass(change) { if (change === null || change === undefined) return 'trend-stable'; return change > 0 ? 'trend-up' : 'trend-down'; },
+                formatChange(change) { if (change === null || change === undefined) return '-'; return change > 0 ? `+${change.toFixed(1)}` : change.toFixed(1); },
+                getDistEmoji(index) { return ['🏆', '🌟', '📚', '💪', '🎯'][index] || '📊'; },
+                getDistColor(index) { return ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'][index] || '#666'; },
+                calculateAchievements() {
+                    const scores = this.studentData.score_trend || [];
+                    this.achievements.forEach(a => a.earned = false);
+                    if (scores.length === 0) return;
+                    let points = 0, consecutiveImprovements = 0;
+                    for (let i = 1; i < scores.length; i++) {
+                        const change = scores[i].score - scores[i-1].score;
+                        if (change > 0) { consecutiveImprovements++; points += change <= 5 ? 10 : (change <= 10 ? 20 : 50); }
+                        else { consecutiveImprovements = 0; }
+                    }
+                    if (consecutiveImprovements >= 3) { this.achievements[0].earned = true; points += 100; }
+                    if ((this.studentData.summary?.avg_score || 0) >= 90) { this.achievements[1].earned = true; }
+                    if (scores.length >= 10) { this.achievements[4].earned = true; }
+                    this.totalPoints = points;
+                },
+                saveGoal() {
+                    if (!this.goal.targetScore) { alert('请输入目标分数哦～ 🎯'); return; }
+                    this.goal.saved = true;
+                    const latestScore = this.studentData.score_trend?.[this.studentData.score_trend.length - 1]?.score;
+                    if (latestScore && latestScore >= parseFloat(this.goal.targetScore)) {
+                        this.achievements[2].earned = true;
+                        this.totalPoints += 30;
+                        alert(`🎉 恭喜！目标达成！获得 30 积分！奖励：${this.goal.reward || '未知'}`);
+                    }
+                    setTimeout(() => { this.goal.saved = false; }, 3000);
+                },
+                renderAvgTrendChart() {
+                    const chartElement = document.getElementById('avgTrendChart');
+                    if (!chartElement) {
+                        console.error('avgTrendChart element not found');
+                        return;
+                    }
+                    
+                    const data = this.overview.avg_trend || [];
+                    console.log('Rendering avg trend chart with', data.length, 'items');
+                    
+                    if (data.length === 0) {
+                        chartElement.innerHTML = '<div style="text-align:center;padding:150px;color:#999;">暂无数据</div>';
+                        return;
+                    }
+                    
+                    const chart = echarts.init(chartElement);
+                    chart.setOption({
+                        title: { text: '📈 平均分趋势', left: 'center', textStyle: { fontSize: 16 } },
+                        tooltip: { trigger: 'axis' },
+                        xAxis: { type: 'category', data: data.map(d => d.exam_name), axisLabel: { rotate: 45, interval: 0 } },
+                        yAxis: { type: 'value', min: 0, max: 100 },
+                        grid: { left: '10%', right: '10%', bottom: '15%', top: '15%' },
+                        series: [{ type: 'line', data: data.map(d => d.avg_score), smooth: true, itemStyle: { color: '#FFB6C1' }, areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(255, 182, 193, 0.5)' }, { offset: 1, color: 'rgba(255, 182, 193, 0.1)' }]) } }]
+                    });
+                    
+                    // 响应式调整
+                    window.addEventListener('resize', () => {
+                        chart.resize();
+                    });
+                },
+                renderScoreDistChart() {
+                    const chartElement = document.getElementById('scoreDistChart');
+                    if (!chartElement) {
+                        console.error('scoreDistChart element not found');
+                        return;
+                    }
+                    
+                    const data = this.overview.score_distribution || [];
+                    console.log('Rendering score dist chart with', data.length, 'items');
+                    
+                    if (data.length === 0) {
+                        chartElement.innerHTML = '<div style="text-align:center;padding:150px;color:#999;">暂无数据</div>';
+                        return;
+                    }
+                    
+                    const chart = echarts.init(chartElement);
+                    chart.setOption({
+                        title: { text: '🥧 分数段分布', left: 'center', textStyle: { fontSize: 16 } },
+                        tooltip: { trigger: 'item' },
+                        series: [{ 
+                            type: 'pie', 
+                            radius: ['40%', '70%'],
+                            center: ['50%', '50%'],
+                            data: data.map(d => ({ value: d.count, name: d.level })),
+                            itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+                            label: { show: true, formatter: '{b}: {c}' }
+                        }]
+                    });
+                    
+                    // 响应式调整
+                    window.addEventListener('resize', () => {
+                        chart.resize();
+                    });
+                },
+                renderStudentTrendChart() {
+                    const chartElement = document.getElementById('studentTrendChart');
+                    if (!chartElement) {
+                        console.error('studentTrendChart element not found');
+                        return;
+                    }
+                    
+                    const data = this.studentData.score_trend || [];
+                    console.log('Rendering student trend chart with', data.length, 'items');
+                    
+                    if (data.length === 0) {
+                        chartElement.innerHTML = '<div style="text-align:center;padding:150px;color:#999;">暂无数据</div>';
+                        return;
+                    }
+                    
+                    // 销毁旧图表（如果有）
+                    const oldChart = echarts.getInstanceByDom(chartElement);
+                    if (oldChart) {
+                        oldChart.dispose();
+                    }
+                    
+                    const chart = echarts.init(chartElement);
+                    chart.setOption({
+                        title: { text: `👧 ${this.studentData.student_info?.student_name} 的成绩趋势`, left: 'center', textStyle: { fontSize: 16 } },
+                        tooltip: { trigger: 'axis' },
+                        xAxis: { 
+                            type: 'category', 
+                            data: data.map(d => d.exam_name), 
+                            axisLabel: { rotate: 45, interval: 0 },
+                            name: '考试名称',
+                            nameLocation: 'middle',
+                            nameGap: 50
+                        },
+                        yAxis: { 
+                            type: 'value', 
+                            min: 0, 
+                            max: 100,
+                            name: '分数'
+                        },
+                        grid: { left: '10%', right: '10%', bottom: '15%', top: '15%' },
+                        series: [{ 
+                            type: 'line', 
+                            data: data.map(d => d.score), 
+                            smooth: true, 
+                            itemStyle: { color: '#87CEEB' },
+                            lineStyle: { width: 3 },
+                            markPoint: {
+                                data: [
+                                    { type: 'max', name: '最高分' },
+                                    { type: 'min', name: '最低分' }
+                                ]
+                            },
+                            markLine: {
+                                data: [{ type: 'average', name: '平均分' }]
+                            }
+                        }]
+                    });
+                    
+                    // 响应式调整
+                    window.addEventListener('resize', () => {
+                        chart.resize();
+                    });
+                    
+                    console.log('Student trend chart rendered successfully');
+                },
+                renderClassExamChart() {
+                    const chart = echarts.init(document.getElementById('classExamChart'));
+                    const data = this.classData.exam_stats || [];
+                    chart.setOption({
+                        title: { text: `${this.classData.class_name} - 各次考试统计`, left: 'center', textStyle: { fontSize: 16 } },
+                        tooltip: { trigger: 'axis' },
+                        xAxis: { type: 'category', data: data.map(d => d.exam_name), axisLabel: { rotate: 45 } },
+                        yAxis: { type: 'value', min: 0, max: 100 },
+                        series: [
+                            { type: 'line', name: '平均分', data: data.map(d => d.avg_score), smooth: true, itemStyle: { color: '#FFB6C1' } },
+                            { type: 'line', name: '最高分', data: data.map(d => d.max_score), itemStyle: { color: '#98FB98' } },
+                            { type: 'line', name: '最低分', data: data.map(d => d.min_score), itemStyle: { color: '#FFA07A' } }
+                        ]
+                    });
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
