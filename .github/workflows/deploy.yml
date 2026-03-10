@@ -1,1 +1,22 @@
-﻿name: Deploy`non:  push:    branches: [master]`n`njobs:  deploy:    runs-on: ubuntu-latest    steps:    - uses: actions/checkout@v4    - name: Deploy      uses: aliyun/fc-deploy-action@v1.3      with:        access-key-id: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}        access-key-secret: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}        region: cn-hangzhou        service-name: math-score        function-name: api        code-dir: backend        handler: index.handler        runtime: python3.10
+﻿name: Deploy to Aliyun FC
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Deploy to FC
+      uses: aliyun/fc-deploy-action@v1.3
+      with:
+        access-key-id: ${{ secrets.ALIYUN_ACCESS_KEY_ID }}
+        access-key-secret: ${{ secrets.ALIYUN_ACCESS_KEY_SECRET }}
+        region: cn-hangzhou
+        service-name: math-score
+        function-name: api
+        code-dir: backend
+        handler: index.handler
+        runtime: python3.10
