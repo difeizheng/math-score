@@ -1,212 +1,68 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>馃帗 瀹忚鍒嗘瀽浠〃鐩?- 鑼楀績鐨勬暟瀛︽垚闀夸箰鍥?/title>
+    <title>🎓 宏观分析 - 茗心的数学成长乐园</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container { max-width: 1600px; margin: 0 auto; }
-        .header {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-            text-align: center;
-        }
+        body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 20px; text-align: center; }
         .header h1 { color: #667eea; font-size: 2em; margin-bottom: 10px; }
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-        .card h2 {
-            color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .stat-box {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-        }
-        .stat-box .num { font-size: 2.5em; font-weight: bold; margin-bottom: 5px; }
-        .stat-box .label { font-size: 0.9em; opacity: 0.9; }
+        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
+        .card h2 { color: #333; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 15px; text-align: center; }
+        .stat-box .num { font-size: 2.5em; font-weight: bold; }
         .chart-container { width: 100%; height: 350px; }
-        .risk-indicator {
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .risk-high { background: linear-gradient(135deg, #FEE2E2, #FECACA); color: #991b1b; }
-        .risk-medium { background: linear-gradient(135deg, #FFEDD5, #FED7AA); color: #9a3412; }
-        .risk-low { background: linear-gradient(135deg, #FEF3C7, #FDE68A); color: #92400e; }
-        .risk-safe { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); color: #065f46; }
-        .advice-item {
-            padding: 15px;
-            border-left: 4px solid #667eea;
-            background: #f8f9ff;
-            margin-bottom: 10px;
-            border-radius: 0 10px 10px 0;
-        }
-        .advice-item.high { border-left-color: #ef4444; background: #fef2f2; }
-        .advice-item.medium { border-left-color: #f59e0b; background: #fffbeb; }
-        .advice-item.low { border-left-color: #10b981; background: #ecfdf5; }
+        .back-btn { display: inline-block; padding: 10px 25px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-decoration: none; border-radius: 25px; margin-bottom: 20px; }
         .loading { text-align: center; padding: 40px; }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px; height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .back-btn {
-            display: inline-block;
-            padding: 10px 25px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
     <div id="app">
         <div class="container">
-            <a href="index.html" class="back-btn">鈫?杩斿洖棣栭〉</a>
+            <a href="index.html" class="back-btn">← 返回首页</a>
             
             <div class="header">
-                <h1>馃帗 瀹忚鍒嗘瀽浠〃鐩?/h1>
-                <p>娣卞害鍒嗘瀽 路 鎴愮哗棰勬祴 路 椋庨櫓棰勮 路 瀛︿範寤鸿</p>
+                <h1>🎓 宏观分析仪表盘</h1>
+                <p>深度分析 · 成绩预测 · 风险预警</p>
             </div>
             
-            <div v-if="loading" class="loading">
-                <div class="spinner"></div>
-                <p>姝ｅ湪鍒嗘瀽鏁版嵁...</p>
-            </div>
+            <div v-if="loading" class="loading"><div class="spinner"></div><p>加载中...</p></div>
             
             <template v-else>
-                <!-- 鏍稿績鎸囨爣 -->
-                <div class="grid-4">
-                    <div class="stat-box">
-                        <div class="num">{{ dashboard.percentile?.percentile || 0 }}%</div>
-                        <div class="label">馃搳 鐧惧垎浣嶆帓鍚?/div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="num">{{ dashboard.prediction?.predicted_score || 0 }}</div>
-                        <div class="label">馃敭 棰勬祴鍒嗘暟</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="num">{{ dashboard.stability?.mean_score || 0 }}</div>
-                        <div class="label">馃搱 骞冲潎鍒?/div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="num">{{ dashboard.stability?.cv || 0 }}%</div>
-                        <div class="label">馃幆 娉㈠姩鐜?/div>
-                    </div>
+                <div class="stats-grid">
+                    <div class="stat-box"><div class="num">{{ dashboard.percentile }}%</div><div>百分位排名</div></div>
+                    <div class="stat-box"><div class="num">{{ dashboard.predicted }}</div><div>预测分数</div></div>
+                    <div class="stat-box"><div class="num">{{ dashboard.avg }}</div><div>平均分</div></div>
+                    <div class="stat-box"><div class="num">{{ dashboard.cv }}%</div><div>波动率</div></div>
                 </div>
                 
-                <!-- 椋庨櫓棰勮 -->
                 <div class="card">
-                    <h2>鈿狅笍 椋庨櫓棰勮</h2>
-                    <div :class="['risk-indicator', getRiskClass(dashboard.risk?.risk_level)]">
-                        <div style="font-size: 3em; margin-bottom: 10px;">{{ getRiskEmoji(dashboard.risk?.risk_level) }}</div>
-                        <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 10px;">{{ dashboard.risk?.message }}</div>
-                        <div>椋庨櫓鍒嗘暟锛歿{ dashboard.risk?.risk_score }} | 娉㈠姩鐜囷細{{ dashboard.risk?.volatility }}</div>
-                        <div v-if="dashboard.risk?.risk_factors && dashboard.risk.risk_factors.length > 0">
-                            椋庨櫓鍥犵礌锛歿{ dashboard.risk.risk_factors.join('銆?) }}
-                        </div>
+                    <h2>⚠️ 风险预警</h2>
+                    <div :class="['risk-box', dashboard.risk_level]" style="padding: 20px; border-radius: 15px; text-align: center; background: #fef2f2; border: 2px solid #fecaca;">
+                        <div style="font-size: 3em;">{{ dashboard.risk_emoji }}</div>
+                        <div style="font-size: 1.5em; font-weight: bold; margin: 10px 0;">{{ dashboard.risk_message }}</div>
+                        <div>风险分数：{{ dashboard.risk_score }}</div>
                     </div>
                 </div>
                 
-                <!-- 瀛﹀勾瀵规瘮鍜岄娴?-->
-                <div class="grid-2">
-                    <div class="card">
-                        <h2>馃搳 瀛﹀勾瀵规瘮</h2>
-                        <div id="semesterChart" class="chart-container"></div>
-                    </div>
-                    <div class="card">
-                        <h2>馃敭 鎴愮哗棰勬祴</h2>
-                        <div style="text-align: center; padding: 40px;">
-                            <div style="font-size: 4em; font-weight: bold; color: #667eea; margin-bottom: 10px;">
-                                {{ dashboard.prediction?.predicted_score || '-' }}
-                            </div>
-                            <div style="color: #666; margin-bottom: 20px;">棰勬祴涓嬫鑰冭瘯鍒嗘暟</div>
-                            <div style="display: inline-block; padding: 15px 30px; background: #f0f4ff; border-radius: 15px;">
-                                <div style="margin-bottom: 10px;">
-                                    <strong>缃俊鍖洪棿锛?/strong>
-                                    <span style="color: #667eea; font-weight: bold;">
-                                        {{ dashboard.prediction?.confidence_interval?.lower }} - {{ dashboard.prediction?.confidence_interval?.upper }}
-                                    </span>
-                                </div>
-                                <div><strong>瓒嬪娍锛?/strong>{{ dashboard.prediction?.trend }}</div>
-                                <div><strong>鍙俊搴︼細</strong>{{ dashboard.prediction?.confidence }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 绋冲畾鎬у垎鏋?-->
                 <div class="card">
-                    <h2>馃搱 鎴愮哗绋冲畾鎬у垎鏋?/h2>
-                    <div class="grid-4">
-                        <div style="text-align: center; padding: 15px;">
-                            <div style="font-size: 2em; margin-bottom: 5px;">{{ dashboard.stability?.emoji }}</div>
-                            <div style="font-weight: bold; color: #667eea;">{{ dashboard.stability?.stability }}</div>
-                            <div style="font-size: 0.85em; color: #666;">绋冲畾鎬ц瘎绾?/div>
-                        </div>
-                        <div style="text-align: center; padding: 15px;">
-                            <div style="font-size: 2em; margin-bottom: 5px;">馃搳</div>
-                            <div style="font-weight: bold; color: #667eea;">{{ dashboard.stability?.mean_score }}</div>
-                            <div style="font-size: 0.85em; color: #666;">骞冲潎鍒?/div>
-                        </div>
-                        <div style="text-align: center; padding: 15px;">
-                            <div style="font-size: 2em; margin-bottom: 5px;">馃搻</div>
-                            <div style="font-weight: bold; color: #667eea;">{{ dashboard.stability?.std_dev }}</div>
-                            <div style="font-size: 0.85em; color: #666;">鏍囧噯宸?/div>
-                        </div>
-                        <div style="text-align: center; padding: 15px;">
-                            <div style="font-size: 2em; margin-bottom: 5px;">馃幆</div>
-                            <div style="font-weight: bold; color: #667eea;">{{ dashboard.stability?.cv }}%</div>
-                            <div style="font-size: 0.85em; color: #666;">鍙樺紓绯绘暟</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 20px; padding: 15px; background: #f8f9ff; border-radius: 10px;">
-                        <div><strong>涓婂崌娆℃暟锛?/strong>{{ dashboard.stability?.up_count }} | <strong>涓嬮檷娆℃暟锛?/strong>{{ dashboard.stability?.down_count }} | <strong>鎸佸钩娆℃暟锛?/strong>{{ dashboard.stability?.stable_count }}</div>
-                        <div style="margin-top: 10px;"><strong>鏈€澶ф尝鍔細</strong>{{ dashboard.stability?.max_change }} 鍒?/div>
-                    </div>
+                    <h2>📊 学年对比</h2>
+                    <div id="semesterChart" class="chart-container"></div>
                 </div>
                 
-                <!-- 瀛︿範寤鸿 -->
                 <div class="card">
-                    <h2>馃挕 涓€у寲瀛︿範寤鸿</h2>
-                    <div v-for="(advice, index) in dashboard.advice" :key="index" :class="['advice-item', advice.priority]">
-                        <div style="font-weight: bold; margin-bottom: 5px; color: #333;">{{ advice.title }}</div>
-                        <div style="color: #666;">{{ advice.content }}</div>
+                    <h2>💡 学习建议</h2>
+                    <div v-for="(advice, i) in dashboard.advice" :key="i" style="padding: 15px; margin: 10px 0; border-left: 4px solid #667eea; background: #f8f9ff; border-radius: 0 10px 10px 0;">
+                        <div style="font-weight: bold; color: #333;">{{ advice.title }}</div>
+                        <div style="color: #666; margin-top: 5px;">{{ advice.content }}</div>
                     </div>
                 </div>
             </template>
@@ -214,117 +70,108 @@
     </div>
     
     <script>
+        const API = 'https://5fb7-2408-8956-71-1c1d-9183-7145-4b64-6689.ngrok-free.app';
+        
         const { createApp } = Vue;
-        const API = 'http://localhost:8808/api';
         
         createApp({
             data() {
                 return {
-                    loading: true,
+                    loading: false,
                     dashboard: {
-                        semester_stats: { semester_stats: [], trend: {} },
-                        prediction: {},
-                        risk: {},
-                        percentile: {},
-                        stability: {},
+                        percentile: 0,
+                        predicted: 0,
+                        avg: 0,
+                        cv: 0,
+                        risk_level: 'safe',
+                        risk_emoji: '🟢',
+                        risk_message: '状态良好',
+                        risk_score: 0,
                         advice: []
                     }
                 }
             },
-            
             mounted() {
                 this.loadDashboard();
-                window.addEventListener('resize', () => {
-                    echarts.dispose(document.getElementById('semesterChart'));
-                    this.$nextTick(() => {
-                        this.renderSemesterChart();
-                    });
-                });
             },
-            
             methods: {
                 async loadDashboard() {
                     this.loading = true;
                     try {
-                        const res = await fetch(`${API}/advanced/dashboard/3`);
-                        const data = await res.json();
-                        this.dashboard = data;
+                        const r = await fetch(`${API}/advanced/dashboard/3`);
+                        const data = await r.json();
                         
-                        console.log('Dashboard loaded:', data);
+                        this.dashboard.percentile = data.percentile?.percentile || 0;
+                        this.dashboard.predicted = data.prediction?.predicted_score || 0;
+                        this.dashboard.avg = data.stability?.mean_score || 0;
+                        this.dashboard.cv = data.stability?.cv || 0;
                         
-                        setTimeout(() => {
-                            this.renderSemesterChart();
-                        }, 200);
+                        const risk = data.risk || {};
+                        this.dashboard.risk_score = risk.risk_score || 0;
+                        this.dashboard.risk_message = risk.message || '状态良好';
+                        
+                        if (risk.risk_level === 'high') {
+                            this.dashboard.risk_level = 'risk-high';
+                            this.dashboard.risk_emoji = '🔴';
+                        } else if (risk.risk_level === 'medium') {
+                            this.dashboard.risk_level = 'risk-medium';
+                            this.dashboard.risk_emoji = '🟠';
+                        } else if (risk.risk_level === 'low') {
+                            this.dashboard.risk_level = 'risk-low';
+                            this.dashboard.risk_emoji = '🟡';
+                        }
+                        
+                        this.dashboard.advice = data.advice || [];
+                        
+                        if (data.semester_stats?.semester_stats) {
+                            this.$nextTick(() => {
+                                this.renderSemesterChart(data.semester_stats.semester_stats);
+                            });
+                        }
                     } catch (e) {
-                        console.error('鍔犺浇澶辫触:', e);
+                        console.error('加载失败:', e);
+                        alert('加载数据失败，请检查后端是否运行');
                     } finally {
                         this.loading = false;
                     }
                 },
-                
-                getRiskClass(level) {
-                    const classes = {
-                        'high': 'risk-high',
-                        'medium': 'risk-medium',
-                        'low': 'risk-low',
-                        'safe': 'risk-safe'
-                    };
-                    return classes[level] || 'risk-safe';
-                },
-                
-                getRiskEmoji(level) {
-                    const emojis = {
-                        'high': '馃敶',
-                        'medium': '馃煚',
-                        'low': '馃煛',
-                        'safe': '馃煝'
-                    };
-                    return emojis[level] || '馃煝';
-                },
-                
-                renderSemesterChart() {
+                renderSemesterChart(data) {
                     const chart = echarts.init(document.getElementById('semesterChart'));
-                    const data = this.dashboard.semester_stats?.semester_stats || [];
+                    chart.setOption({
+                        title: { text: '各学期成绩趋势', left: 'center', textStyle: { fontSize: 16 } },
+                        tooltip: { trigger: 'axis' },
+                        xAxis: { 
+                            type: 'category', 
+                            data: data.map(d => d.semester),
+                            axisLabel: { rotate: 45, interval: 0 }
+                        },
+                        yAxis: { type: 'value', min: 0, max: 100, name: '分数' },
+                        grid: { left: '10%', right: '10%', bottom: '20%', top: '15%' },
+                        series: [{
+                            type: 'bar',
+                            data: data.map(d => d.avg_score),
+                            itemStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: '#667eea' },
+                                    { offset: 1, color: '#764ba2' }
+                                ]),
+                                borderRadius: [10, 10, 0, 0]
+                            }
+                        }, {
+                            type: 'line',
+                            data: data.map(d => d.avg_score),
+                            smooth: true,
+                            itemStyle: { color: '#f59e0b' },
+                            lineStyle: { width: 3 }
+                        }]
+                    });
                     
-                    if (!data || data.length === 0) {
-                        console.log('No semester data');
-                        return;
-                    }
-                    
-                    setTimeout(() => {
-                        chart.setOption({
-                            title: { text: '鍚勫鏈熸垚缁╄秼鍔?, left: 'center' },
-                            tooltip: { trigger: 'axis' },
-                            xAxis: {
-                                type: 'category',
-                                data: data.map(d => d.semester),
-                                axisLabel: { rotate: 45, interval: 0 }
-                            },
-                            yAxis: { type: 'value', min: 0, max: 100 },
-                            grid: { left: '10%', right: '10%', bottom: '20%', top: '15%' },
-                            series: [{
-                                type: 'bar',
-                                data: data.map(d => d.avg_score),
-                                itemStyle: {
-                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                        { offset: 0, color: '#667eea' },
-                                        { offset: 1, color: '#764ba2' }
-                                    ]),
-                                    borderRadius: [10, 10, 0, 0]
-                                }
-                            }, {
-                                type: 'line',
-                                data: data.map(d => d.avg_score),
-                                smooth: true,
-                                itemStyle: { color: '#f59e0b' },
-                                lineStyle: { width: 3 }
-                            }]
-                        });
-                    }, 100);
+                    window.addEventListener('resize', () => {
+                        chart.resize();
+                    });
                 }
             }
         }).mount('#app');
     </script>
 </body>
 </html>
-
