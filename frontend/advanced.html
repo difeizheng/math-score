@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎓 宏观分析仪表盘 - 茗心的数学成长乐园</title>
+    <title>馃帗 瀹忚鍒嗘瀽浠〃鐩?- 鑼楀績鐨勬暟瀛︽垚闀夸箰鍥?/title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
@@ -97,113 +97,113 @@
 <body>
     <div id="app">
         <div class="container">
-            <a href="index.html" class="back-btn">← 返回首页</a>
+            <a href="index.html" class="back-btn">鈫?杩斿洖棣栭〉</a>
             
             <div class="header">
-                <h1>🎓 宏观分析仪表盘</h1>
-                <p>深度分析 · 成绩预测 · 风险预警 · 学习建议</p>
+                <h1>馃帗 瀹忚鍒嗘瀽浠〃鐩?/h1>
+                <p>娣卞害鍒嗘瀽 路 鎴愮哗棰勬祴 路 椋庨櫓棰勮 路 瀛︿範寤鸿</p>
             </div>
             
             <div v-if="loading" class="loading">
                 <div class="spinner"></div>
-                <p>正在分析数据...</p>
+                <p>姝ｅ湪鍒嗘瀽鏁版嵁...</p>
             </div>
             
             <template v-else>
-                <!-- 核心指标 -->
+                <!-- 鏍稿績鎸囨爣 -->
                 <div class="grid-4">
                     <div class="stat-box">
                         <div class="num">{{ dashboard.percentile?.percentile || 0 }}%</div>
-                        <div class="label">📊 百分位排名</div>
+                        <div class="label">馃搳 鐧惧垎浣嶆帓鍚?/div>
                     </div>
                     <div class="stat-box">
                         <div class="num">{{ dashboard.prediction?.predicted_score || 0 }}</div>
-                        <div class="label">🔮 预测分数</div>
+                        <div class="label">馃敭 棰勬祴鍒嗘暟</div>
                     </div>
                     <div class="stat-box">
                         <div class="num">{{ dashboard.stability?.mean_score || 0 }}</div>
-                        <div class="label">📈 平均分</div>
+                        <div class="label">馃搱 骞冲潎鍒?/div>
                     </div>
                     <div class="stat-box">
                         <div class="num">{{ dashboard.stability?.cv || 0 }}%</div>
-                        <div class="label">🎯 波动率</div>
+                        <div class="label">馃幆 娉㈠姩鐜?/div>
                     </div>
                 </div>
                 
-                <!-- 风险预警 -->
+                <!-- 椋庨櫓棰勮 -->
                 <div class="card">
-                    <h2>⚠️ 风险预警</h2>
+                    <h2>鈿狅笍 椋庨櫓棰勮</h2>
                     <div :class="['risk-indicator', getRiskClass(dashboard.risk?.risk_level)]">
                         <div style="font-size: 3em; margin-bottom: 10px;">{{ getRiskEmoji(dashboard.risk?.risk_level) }}</div>
                         <div style="font-size: 1.5em; font-weight: bold; margin-bottom: 10px;">{{ dashboard.risk?.message }}</div>
-                        <div>风险分数：{{ dashboard.risk?.risk_score }} | 波动率：{{ dashboard.risk?.volatility }}</div>
+                        <div>椋庨櫓鍒嗘暟锛歿{ dashboard.risk?.risk_score }} | 娉㈠姩鐜囷細{{ dashboard.risk?.volatility }}</div>
                         <div v-if="dashboard.risk?.risk_factors && dashboard.risk.risk_factors.length > 0">
-                            风险因素：{{ dashboard.risk.risk_factors.join('、') }}
+                            椋庨櫓鍥犵礌锛歿{ dashboard.risk.risk_factors.join('銆?) }}
                         </div>
                     </div>
                 </div>
                 
-                <!-- 学年对比和预测 -->
+                <!-- 瀛﹀勾瀵规瘮鍜岄娴?-->
                 <div class="grid-2">
                     <div class="card">
-                        <h2>📊 学年对比</h2>
+                        <h2>馃搳 瀛﹀勾瀵规瘮</h2>
                         <div id="semesterChart" class="chart-container"></div>
                     </div>
                     <div class="card">
-                        <h2>🔮 成绩预测</h2>
+                        <h2>馃敭 鎴愮哗棰勬祴</h2>
                         <div style="text-align: center; padding: 40px;">
                             <div style="font-size: 4em; font-weight: bold; color: #667eea; margin-bottom: 10px;">
                                 {{ dashboard.prediction?.predicted_score || '-' }}
                             </div>
-                            <div style="color: #666; margin-bottom: 20px;">预测下次考试分数</div>
+                            <div style="color: #666; margin-bottom: 20px;">棰勬祴涓嬫鑰冭瘯鍒嗘暟</div>
                             <div style="display: inline-block; padding: 15px 30px; background: #f0f4ff; border-radius: 15px;">
                                 <div style="margin-bottom: 10px;">
-                                    <strong>置信区间：</strong>
+                                    <strong>缃俊鍖洪棿锛?/strong>
                                     <span style="color: #667eea; font-weight: bold;">
                                         {{ dashboard.prediction?.confidence_interval?.lower }} - {{ dashboard.prediction?.confidence_interval?.upper }}
                                     </span>
                                 </div>
-                                <div><strong>趋势：</strong>{{ dashboard.prediction?.trend }}</div>
-                                <div><strong>可信度：</strong>{{ dashboard.prediction?.confidence }}</div>
+                                <div><strong>瓒嬪娍锛?/strong>{{ dashboard.prediction?.trend }}</div>
+                                <div><strong>鍙俊搴︼細</strong>{{ dashboard.prediction?.confidence }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- 稳定性分析 -->
+                <!-- 绋冲畾鎬у垎鏋?-->
                 <div class="card">
-                    <h2>📈 成绩稳定性分析</h2>
+                    <h2>馃搱 鎴愮哗绋冲畾鎬у垎鏋?/h2>
                     <div class="grid-4">
                         <div style="text-align: center; padding: 15px;">
                             <div style="font-size: 2em; margin-bottom: 5px;">{{ dashboard.stability?.emoji }}</div>
                             <div style="font-weight: bold; color: #667eea;">{{ dashboard.stability?.stability }}</div>
-                            <div style="font-size: 0.85em; color: #666;">稳定性评级</div>
+                            <div style="font-size: 0.85em; color: #666;">绋冲畾鎬ц瘎绾?/div>
                         </div>
                         <div style="text-align: center; padding: 15px;">
-                            <div style="font-size: 2em; margin-bottom: 5px;">📊</div>
+                            <div style="font-size: 2em; margin-bottom: 5px;">馃搳</div>
                             <div style="font-weight: bold; color: #667eea;">{{ dashboard.stability?.mean_score }}</div>
-                            <div style="font-size: 0.85em; color: #666;">平均分</div>
+                            <div style="font-size: 0.85em; color: #666;">骞冲潎鍒?/div>
                         </div>
                         <div style="text-align: center; padding: 15px;">
-                            <div style="font-size: 2em; margin-bottom: 5px;">📐</div>
+                            <div style="font-size: 2em; margin-bottom: 5px;">馃搻</div>
                             <div style="font-weight: bold; color: #667eea;">{{ dashboard.stability?.std_dev }}</div>
-                            <div style="font-size: 0.85em; color: #666;">标准差</div>
+                            <div style="font-size: 0.85em; color: #666;">鏍囧噯宸?/div>
                         </div>
                         <div style="text-align: center; padding: 15px;">
-                            <div style="font-size: 2em; margin-bottom: 5px;">🎯</div>
+                            <div style="font-size: 2em; margin-bottom: 5px;">馃幆</div>
                             <div style="font-weight: bold; color: #667eea;">{{ dashboard.stability?.cv }}%</div>
-                            <div style="font-size: 0.85em; color: #666;">变异系数</div>
+                            <div style="font-size: 0.85em; color: #666;">鍙樺紓绯绘暟</div>
                         </div>
                     </div>
                     <div style="margin-top: 20px; padding: 15px; background: #f8f9ff; border-radius: 10px;">
-                        <div><strong>上升次数：</strong>{{ dashboard.stability?.up_count }} | <strong>下降次数：</strong>{{ dashboard.stability?.down_count }} | <strong>持平次数：</strong>{{ dashboard.stability?.stable_count }}</div>
-                        <div style="margin-top: 10px;"><strong>最大波动：</strong>{{ dashboard.stability?.max_change }} 分</div>
+                        <div><strong>涓婂崌娆℃暟锛?/strong>{{ dashboard.stability?.up_count }} | <strong>涓嬮檷娆℃暟锛?/strong>{{ dashboard.stability?.down_count }} | <strong>鎸佸钩娆℃暟锛?/strong>{{ dashboard.stability?.stable_count }}</div>
+                        <div style="margin-top: 10px;"><strong>鏈€澶ф尝鍔細</strong>{{ dashboard.stability?.max_change }} 鍒?/div>
                     </div>
                 </div>
                 
-                <!-- 学习建议 -->
+                <!-- 瀛︿範寤鸿 -->
                 <div class="card">
-                    <h2>💡 个性化学习建议</h2>
+                    <h2>馃挕 涓€у寲瀛︿範寤鸿</h2>
                     <div v-for="(advice, index) in dashboard.advice" :key="index" :class="['advice-item', advice.priority]">
                         <div style="font-weight: bold; margin-bottom: 5px; color: #333;">{{ advice.title }}</div>
                         <div style="color: #666;">{{ advice.content }}</div>
@@ -256,7 +256,7 @@
                             this.renderSemesterChart();
                         }, 200);
                     } catch (e) {
-                        console.error('加载失败:', e);
+                        console.error('鍔犺浇澶辫触:', e);
                     } finally {
                         this.loading = false;
                     }
@@ -274,12 +274,12 @@
                 
                 getRiskEmoji(level) {
                     const emojis = {
-                        'high': '🔴',
-                        'medium': '🟠',
-                        'low': '🟡',
-                        'safe': '🟢'
+                        'high': '馃敶',
+                        'medium': '馃煚',
+                        'low': '馃煛',
+                        'safe': '馃煝'
                     };
-                    return emojis[level] || '🟢';
+                    return emojis[level] || '馃煝';
                 },
                 
                 renderSemesterChart() {
@@ -293,7 +293,7 @@
                     
                     setTimeout(() => {
                         chart.setOption({
-                            title: { text: '各学期成绩趋势', left: 'center' },
+                            title: { text: '鍚勫鏈熸垚缁╄秼鍔?, left: 'center' },
                             tooltip: { trigger: 'axis' },
                             xAxis: {
                                 type: 'category',
@@ -327,3 +327,4 @@
     </script>
 </body>
 </html>
+
