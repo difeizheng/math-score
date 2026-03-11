@@ -1,389 +1,125 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>馃専 鑼楀績鐨勬暟瀛︽垚闀夸箰鍥?馃専</title>
+    <title>🌟 茗心的数学成长乐园 🌟</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --primary-pink: #FFB6C1;
-            --primary-blue: #87CEEB;
-            --accent-yellow: #FFD700;
-            --success-green: #98FB98;
-            --warning-orange: #FFA07A;
-            --background: #F8F9FF;
-            --card-bg: #FFFFFF;
-        }
-        body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #F8F9FF 0%, #FFE4F0 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+        body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: linear-gradient(135deg, #F8F9FF 0%, #FFE4F0 100%); min-height: 100vh; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
-        .header {
-            background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%);
-            padding: 30px;
-            border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4);
-            margin-bottom: 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .header::before { content: '馃寛'; position: absolute; top: 10px; left: 20px; font-size: 3em; animation: float 3s ease-in-out infinite; }
-        .header::after { content: '馃寛'; position: absolute; top: 10px; right: 20px; font-size: 3em; animation: float 3s ease-in-out infinite reverse; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .header h1 { color: white; font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        .header p { color: white; font-size: 1.2em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(255, 182, 193, 0.3);
-            border: 3px solid transparent;
-            transition: all 0.3s;
-        }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 182, 193, 0.5); }
-        .card.pink { border-color: var(--primary-pink); }
-        .card.blue { border-color: var(--primary-blue); }
-        .card.yellow { border-color: var(--accent-yellow); }
-        .card h2 { color: #667eea; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px dashed var(--primary-pink); display: flex; align-items: center; gap: 10px; }
+        .header { background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%); padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4); margin-bottom: 20px; text-align: center; }
+        .header h1 { color: white; font-size: 2.5em; margin-bottom: 10px; }
+        .header p { color: white; font-size: 1.2em; }
+        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(255, 182, 193, 0.3); }
+        .card h2 { color: #667eea; margin-bottom: 20px; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
-        .stat-card {
-            background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card::before { content: '鉁?; position: absolute; top: 5px; right: 10px; font-size: 1.5em; }
+        .stat-card { background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%); color: white; padding: 20px; border-radius: 20px; text-align: center; }
         .stat-card .number { font-size: 2.5em; font-weight: bold; margin-bottom: 5px; }
-        .stat-card .label { font-size: 0.95em; opacity: 0.95; }
+        .stat-card .label { font-size: 0.95em; }
         .chart-container { width: 100%; height: 400px; }
-        .upload-area {
-            border: 3px dashed var(--primary-pink);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #FFF5F8 0%, #F0F8FF 100%);
-        }
-        .upload-area:hover { background: linear-gradient(135deg, #FFE4F0 0%, #E0F0FF 100%); border-color: var(--primary-blue); transform: scale(1.02); }
-        .upload-area.dragover { background: linear-gradient(135deg, #FFE4F0 0%, #E0F0FF 100%); border-color: var(--primary-blue); }
-        .upload-icon { font-size: 4em; margin-bottom: 15px; }
-        .btn {
-            background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255, 182, 193, 0.6); }
-        .btn-small { padding: 8px 20px; font-size: 0.9em; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; border-radius: 15px; overflow: hidden; }
+        .student-select { width: 100%; padding: 12px; border: 2px solid #FFB6C1; border-radius: 15px; font-size: 1em; margin-bottom: 15px; }
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; padding: 10px 25px; border-radius: 50px; box-shadow: 0 5px 25px rgba(255, 182, 193, 0.5); }
+        .tab { padding: 12px 25px; background: white; border: 2px solid #FFB6C1; border-radius: 25px; cursor: pointer; margin: 0 5px; }
+        .tab.active { background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%); color: white; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
-        th { background: linear-gradient(135deg, #FFE4F0 0%, #E0F0FF 100%); color: #667eea; font-weight: bold; }
-        tr:hover { background: #FFF5F8; }
-        .trend-up { color: #10b981; font-weight: bold; }
-        .trend-down { color: #ef4444; font-weight: bold; }
-        .trend-stable { color: #6b7280; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .tab {
-            padding: 12px 25px;
-            background: white;
-            border: 2px solid var(--primary-pink);
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1em;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .tab:hover { background: var(--primary-pink); color: white; transform: translateY(-2px); }
-        .tab.active { background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%); color: white; border-color: transparent; box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4); }
-        .alert { padding: 15px 20px; border-radius: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .alert-success { background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); color: #065f46; border: 2px solid #10b981; }
-        .alert-error { background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); color: #991b1b; border: 2px solid #ef4444; }
-        .loading { text-align: center; padding: 40px; color: #667eea; }
-        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #FFB6C1; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        th { background: #f8f9ff; color: #667eea; }
+        .loading { text-align: center; padding: 40px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #FFB6C1; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .student-select { width: 100%; padding: 12px 15px; border: 2px solid var(--primary-pink); border-radius: 15px; font-size: 1em; margin-bottom: 15px; background: white; }
-        .student-select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 10px rgba(135, 206, 235, 0.3); }
-        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-top: 20px; }
-        .achievement-card { background: linear-gradient(135deg, #FFF5F8 0%, #F0F8FF 100%); border: 3px solid var(--primary-pink); border-radius: 20px; padding: 20px; text-align: center; transition: all 0.3s; position: relative; }
-        .achievement-card:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(255, 182, 193, 0.4); }
-        .achievement-card.locked { opacity: 0.5; filter: grayscale(0.8); }
-        .achievement-icon { font-size: 3em; margin-bottom: 10px; }
-        .achievement-name { font-weight: bold; color: #667eea; margin-bottom: 5px; }
-        .achievement-desc { font-size: 0.85em; color: #666; }
-        .achievement-card.earned::after { content: '鉁?; position: absolute; top: 10px; right: 10px; font-size: 1.5em; }
-        .goal-setting { background: linear-gradient(135deg, #FFF5F8 0%, #F0F8FF 100%); border: 3px dashed var(--primary-blue); border-radius: 20px; padding: 25px; margin-top: 20px; }
-        .goal-input-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .goal-input { padding: 12px; border: 2px solid var(--primary-pink); border-radius: 12px; font-size: 1em; }
-        .goal-input:focus { outline: none; border-color: var(--primary-blue); }
-        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: white; padding: 10px 25px; border-radius: 50px; box-shadow: 0 5px 25px rgba(255, 182, 193, 0.5); z-index: 1000; }
-        .points-display { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: white; padding: 15px 25px; border-radius: 20px; display: inline-flex; align-items: center; gap: 10px; font-size: 1.2em; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
-        .print-mode .tabs, .print-mode .upload-area, .print-mode .btn, .print-mode .bottom-nav { display: none !important; }
-        .kids-view .stat-card .number { font-size: 3em; }
-        .kids-view .card h2 { font-size: 1.5em; }
-        .kids-view table { font-size: 1.1em; }
     </style>
 </head>
 <body>
-    <div id="app" :class="{ 'print-mode': printMode, 'kids-view': kidsView }">
+    <div id="app">
         <div class="container">
             <div class="header">
-                <h1>馃専 鑼楀績鐨勬暟瀛︽垚闀夸箰鍥?馃専</h1>
-                <p>姣忎竴娆¤繘姝ワ紝閮藉€煎緱琚湅瑙侊紒鉁?/p>
-                <p class="subtitle">馃摎 蹇箰瀛︿範 路 鍋ュ悍鎴愰暱 馃摎</p>
+                <h1>🌟 茗心的数学成长乐园 🌟</h1>
+                <p>每一次进步，都值得被看见！✨</p>
             </div>
             
-            <div class="card no-print">
-                <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; gap: 15px; align-items: center;">
-                        <button class="btn btn-small" @click="kidsView = !kidsView">{{ kidsView ? '馃懅 鍎跨瑙嗗浘' : '馃懆鈥嶐煉?鎴愪汉瑙嗗浘' }}</button>
-                        <button class="btn btn-small" @click="printMode = !printMode">{{ printMode ? '鉂?閫€鍑烘墦鍗? : '馃枿锔?鎵撳嵃妯″紡' }}</button>
-                        <a href="advanced.html" class="btn btn-small">馃幆 瀹忚鍒嗘瀽</a>
-                    </div>
-                    <div class="points-display" v-if="totalPoints > 0">
-                        <span class="points-icon">馃専</span>
-                        <span>绉垎锛歿{ totalPoints }}</span>
-                    </div>
-                </div>
+            <div class="bottom-nav">
+                <button class="tab" :class="{active: currentTab === 'overview'}" @click="currentTab = 'overview'">📈 概览</button>
+                <button class="tab" :class="{active: currentTab === 'student'}" @click="currentTab = 'student'">👧 茗心</button>
+                <button class="tab" :class="{active: currentTab === 'class'}" @click="currentTab = 'class'">🏫 班级</button>
             </div>
             
-            <div class="card pink no-print" v-if="currentTab === 'import'">
-                <h2>馃搧 鏁版嵁瀵煎叆</h2>
-                <div class="upload-area" @dragover.prevent="dragover = true" @dragleave.prevent="dragover = false" @drop.prevent="handleDrop" @click="$refs.fileInput.click()" :class="{dragover: dragover}">
-                    <div class="upload-icon">馃摛</div>
-                    <p style="font-size: 1.2em; margin-bottom: 10px;">鎷栨嫿 Excel 鏂囦欢鍒版澶勶紝鎴栫偣鍑讳笂浼?/p>
-                    <p style="color: #666; font-size: 0.9em;">鏀寔鐨勫垪锛氬鍙枫€佸鍚嶃€佺彮绾с€佽€冭瘯鍚嶇О銆佽€冭瘯鏃ユ湡銆佹垚缁┿€佹弧鍒嗐€佹帓鍚?/p>
-                    <input type="file" ref="fileInput" accept=".xlsx,.xls,.csv" @change="handleFileSelect" style="display: none" />
-                </div>
-                <div v-if="uploadMessage" :class="['alert', uploadSuccess ? 'alert-success' : 'alert-error']">
-                    <span style="font-size: 1.5em;">{{ uploadSuccess ? '鉁? : '鉂? }}</span>
-                    <span>{{ uploadMessage }}</span>
-                </div>
-                <div v-if="uploading" class="loading"><div class="spinner"></div><p>姝ｅ湪瀵煎叆鏁版嵁... 馃搳</p></div>
-            </div>
-            
-            <div class="card blue" v-if="currentTab === 'overview'">
-                <h2>馃搱 鏁翠綋姒傝</h2>
-                <div v-if="loading" class="loading"><div class="spinner"></div><p>鍔犺浇涓?.. 鈴?/p></div>
+            <div class="card" v-if="currentTab === 'overview'">
+                <h2>📈 整体概览</h2>
+                <div v-if="loading" class="loading"><div class="spinner"></div><p>加载中...</p></div>
                 <template v-else>
-                    <div style="background: linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%); padding: 25px; border-radius: 20px; margin-bottom: 25px; text-align: center; color: white; position: relative; overflow: hidden;">
-                        <div style="font-size: 3em; position: absolute; top: -10px; left: 20px; opacity: 0.3;">馃帗</div>
-                        <div style="font-size: 3em; position: absolute; top: -10px; right: 20px; opacity: 0.3;">馃摎</div>
-                        <h3 style="font-size: 1.8em; margin-bottom: 10px; position: relative;">鉁?娆㈣繋鏉ュ埌鏁板鎴愮哗鍒嗘瀽绯荤粺 鉁?/h3>
-                        <p style="font-size: 1.1em; opacity: 0.95; position: relative;">宸叉敹褰?{{ overview.basic_stats?.total_students || 0 }} 浣嶅悓瀛︾殑 {{ overview.basic_stats?.total_records || 0 }} 鏉℃垚闀胯褰?/p>
-                    </div>
                     <div class="stats-grid">
-                        <div class="stat-card" style="background: linear-gradient(135deg, #FFB6C1, #FF69B4);">
-                            <div style="font-size: 2.5em; margin-bottom: 5px;">馃懆鈥嶐煄?/div>
-                            <div class="number">{{ overview.basic_stats?.total_students || 0 }}</div>
-                            <div class="label">瀛︾敓鎬绘暟</div>
-                        </div>
-                        <div class="stat-card" style="background: linear-gradient(135deg, #87CEEB, #4169E1);">
-                            <div style="font-size: 2.5em; margin-bottom: 5px;">馃摑</div>
-                            <div class="number">{{ overview.basic_stats?.total_exams || 0 }}</div>
-                            <div class="label">鑰冭瘯娆℃暟</div>
-                        </div>
-                        <div class="stat-card" style="background: linear-gradient(135deg, #98FB98, #32CD32);">
-                            <div style="font-size: 2.5em; margin-bottom: 5px;">馃搳</div>
-                            <div class="number">{{ overview.basic_stats?.total_records || 0 }}</div>
-                            <div class="label">鎴愮哗璁板綍</div>
-                        </div>
-                        <div class="stat-card" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
-                            <div style="font-size: 2.5em; margin-bottom: 5px;">馃弳</div>
-                            <div class="number">{{ Math.round((overview.basic_stats?.total_records || 0) / (overview.basic_stats?.total_students || 1)) }}</div>
-                            <div class="label">浜哄潎鑰冭瘯</div>
-                        </div>
+                        <div class="stat-card"><div class="number">{{ overview.total_students || 0 }}</div><div class="label">学生总数</div></div>
+                        <div class="stat-card"><div class="number">{{ overview.total_exams || 0 }}</div><div class="label">考试次数</div></div>
+                        <div class="stat-card"><div class="number">{{ overview.total_records || 0 }}</div><div class="label">成绩记录</div></div>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; margin-top: 25px;">
-                        <div style="background: white; padding: 20px; border-radius: 20px; border: 3px solid #FFB6C1;"><div id="avgTrendChart" style="height: 350px;"></div></div>
-                        <div style="background: white; padding: 20px; border-radius: 20px; border: 3px solid #87CEEB;"><div id="scoreDistChart" style="height: 350px;"></div></div>
-                    </div>
-                    <div style="margin-top: 25px; padding: 20px; background: linear-gradient(135deg, #FFF5F8, #F0F8FF); border-radius: 20px; border: 3px dashed #FFB6C1;">
-                        <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; color: #667eea;"><span style="font-size: 1.5em;">馃幆</span> 鍒嗘暟娈靛垎甯冭鎯?/h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                            <div v-for="(dist, index) in overview.score_distribution" :key="index" style="padding: 15px; background: white; border-radius: 15px; text-align: center; border-left: 5px solid;" :style="{borderLeftColor: getDistColor(index)}">
-                                <div style="font-size: 2em; margin-bottom: 5px;">{{ getDistEmoji(index) }}</div>
-                                <div style="font-weight: bold; color: #667eea; margin-bottom: 5px; font-size: 0.85em;">{{ dist.level }}</div>
-                                <div style="font-size: 1.8em; font-weight: bold; color: #333;">{{ dist.count }}</div>
-                                <div style="font-size: 0.85em; color: #999;">浜?/div>
-                                <div style="margin-top: 10px; background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
-                                    <div style="height: 100%; background: linear-gradient(90deg, #FFB6C1, #87CEEB); transition: width 0.5s;" :style="{width: Math.min(100, (dist.count / (overview.basic_stats?.total_records || 1)) * 100 * 5) + '%'}"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="avgTrendChart" class="chart-container"></div>
                 </template>
             </div>
             
-            <div class="card yellow" v-if="currentTab === 'student'">
-                <h2>馃懅 鑼楀績鐨勬垚闀胯建杩?/h2>
-                
-                <!-- 瀛︽湡绛涢€?-->
-                <div style="margin-bottom: 15px; padding: 15px; background: #f8f9ff; border-radius: 15px;">
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #667eea;">馃搮 瀛︽湡绛涢€夛細</span>
-                        <label v-for="sem in availableSemesters" :key="sem" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; background: white; border-radius: 20px; border: 2px solid #FFB6C1; cursor: pointer;">
-                            <input type="checkbox" :value="sem" v-model="selectedSemesters" @change="filterBySemester" style="accent-color: #FFB6C1;" />
-                            <span style="font-size: 0.9em;">{{ sem }}</span>
-                        </label>
-                        <button class="btn btn-small" @click="selectAllSemesters" style="margin-left: 10px;">鍏ㄩ€?/button>
-                        <button class="btn btn-small" @click="resetSemesters" style="background: #f0f0f0;">閲嶇疆</button>
-                    </div>
-                </div>
-                
-                <select v-model="selectedStudent" @change="loadStudentAnalysis" class="student-select">
-                    <option value="">閫夋嫨瀛︾敓...</option>
-                    <option v-for="student in students" :key="student.student_id" :value="student.student_id">{{ student.student_name }} ({{ student.class_name }})</option>
+            <div class="card" v-if="currentTab === 'student'">
+                <h2>👧 茗心的成长轨迹</h2>
+                <select v-model="selectedStudent" @change="loadStudentData" class="student-select">
+                    <option value="">选择学生...</option>
+                    <option v-for="s in students" :key="s.student_id" :value="s.student_id">{{ s.student_name }}</option>
                 </select>
-                <div v-if="studentData.student_info?.student_name">
+                <div v-if="studentData.student_name">
                     <div class="stats-grid">
-                        <div class="stat-card"><div class="number">{{ studentData.summary?.avg_score?.toFixed(1) || '-' }}</div><div class="label">馃搳 骞冲潎鍒?/div></div>
-                        <div class="stat-card"><div class="number">{{ studentData.summary?.max_score || '-' }}</div><div class="label">馃弳 鏈€楂樺垎</div></div>
-                        <div class="stat-card"><div class="number">{{ studentData.summary?.min_score || '-' }}</div><div class="label">馃搱 鏈€浣庡垎</div></div>
-                        <div class="stat-card"><div class="number">{{ studentData.summary?.total_exams || 0 }}</div><div class="label">馃摑 鑰冭瘯娆℃暟</div></div>
+                        <div class="stat-card"><div class="number">{{ studentData.avg_score }}</div><div class="label">平均分</div></div>
+                        <div class="stat-card"><div class="number">{{ studentData.max_score }}</div><div class="label">最高分</div></div>
+                        <div class="stat-card"><div class="number">{{ studentData.min_score }}</div><div class="label">最低分</div></div>
                     </div>
-                    <h3 style="margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><span>馃弳</span> 鎴愬氨寰界珷</h3>
-                    <div class="achievement-grid">
-                        <div v-for="achievement in achievements" :key="achievement.id" class="achievement-card" :class="{ earned: achievement.earned, locked: !achievement.earned }">
-                            <div class="achievement-icon">{{ achievement.icon }}</div>
-                            <div class="achievement-name">{{ achievement.name }}</div>
-                            <div class="achievement-desc">{{ achievement.desc }}</div>
-                        </div>
-                    </div>
-                    <div class="goal-setting">
-                        <h3 style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;"><span>馃幆</span> 鎴戠殑瀛︿範鐩爣</h3>
-                        <div class="goal-input-group">
-                            <input type="number" v-model="goal.targetScore" placeholder="鐩爣鍒嗘暟" class="goal-input" min="0" max="100" />
-                            <input type="text" v-model="goal.reward" placeholder="杈炬垚濂栧姳锛堝锛氬啺娣囨穻馃崷锛? class="goal-input" />
-                            <button class="btn" @click="saveGoal">馃捑 淇濆瓨鐩爣</button>
-                        </div>
-                        <div v-if="goal.saved" class="alert alert-success"><span>鉁?鐩爣宸蹭繚瀛橈紒鍔犳补鍝︼綖馃挭</span></div>
-                    </div>
-                    <div id="studentTrendChart" class="chart-container"></div>
-                    <h3 style="margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;"><span>馃搵</span> 鎴愮哗璇︽儏</h3>
+                    <div id="studentChart" class="chart-container"></div>
+                    <h3 style="margin-top: 20px;">📋 成绩详情</h3>
                     <table>
-                        <thead><tr><th>鑰冭瘯鍚嶇О</th><th>鏃ユ湡</th><th>鎴愮哗</th><th>鍙樺寲</th><th>瓒嬪娍</th></tr></thead>
+                        <thead><tr><th>考试</th><th>日期</th><th>分数</th><th>趋势</th></tr></thead>
                         <tbody>
-                            <tr v-for="score in studentData.score_trend" :key="score.id">
-                                <td>{{ score.exam_name }}</td>
-                                <td>{{ score.exam_date }}</td>
-                                <td><strong>{{ score.score }}</strong></td>
-                                <td :class="getTrendClass(score.score_change)">{{ formatChange(score.score_change) }}</td>
-                                <td :class="getTrendClass(score.score_change)">{{ score.trend || '-' }}</td>
+                            <tr v-for="s in studentData.scores" :key="s.id">
+                                <td>{{ s.exam_name }}</td>
+                                <td>{{ s.exam_date }}</td>
+                                <td><strong>{{ s.score }}</strong></td>
+                                <td>{{ s.trend || '-' }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             
-            <div class="card pink" v-if="currentTab === 'class'">
-                <h2>馃彨 鐝骇鍒嗘瀽</h2>
-                
-                <select v-model="selectedClass" @change="loadClassAnalysis" class="student-select">
-                    <option value="">閫夋嫨鐝骇...</option>
-                    <option v-for="cls in classList" :key="cls" :value="cls">{{ cls }}</option>
+            <div class="card" v-if="currentTab === 'class'">
+                <h2>🏫 班级分析</h2>
+                <select v-model="selectedClass" @change="loadClassData" class="student-select">
+                    <option value="">选择班级...</option>
+                    <option v-for="c in classes" :key="c" :value="c">{{ c }}</option>
                 </select>
-                
-                <!-- 瀛︽湡绛涢€?-->
-                <div v-if="classAvailableSemesters.length > 0" style="margin-bottom: 15px; padding: 15px; background: #f8f9ff; border-radius: 15px;">
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <span style="font-weight: bold; color: #667eea;">馃搮 瀛︽湡绛涢€夛細</span>
-                        <label v-for="sem in classAvailableSemesters" :key="sem" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; background: white; border-radius: 20px; border: 2px solid #FFB6C1; cursor: pointer;">
-                            <input type="checkbox" :value="sem" v-model="classSelectedSemesters" @change="filterClassBySemester" style="accent-color: #FFB6C1;" />
-                            <span style="font-size: 0.9em;">{{ sem }}</span>
-                        </label>
-                        <button class="btn btn-small" @click="selectAllClassSemesters" style="margin-left: 10px;">鍏ㄩ€?/button>
-                        <button class="btn btn-small" @click="resetClassSemesters" style="background: #f0f0f0;">閲嶇疆</button>
-                    </div>
-                </div>
-                
-                <div v-if="classData.class_name">
+                <div v-if="classData.student_count">
                     <div class="stats-grid">
-                        <div class="stat-card"><div class="number">{{ classData.student_count }}</div><div class="label">馃懃 鐝骇浜烘暟</div></div>
-                        <div class="stat-card"><div class="number">{{ classData.exam_stats?.[0]?.avg_score?.toFixed(1) || '-' }}</div><div class="label">馃搳 鏈€鏂板钩鍧囧垎</div></div>
+                        <div class="stat-card"><div class="number">{{ classData.student_count }}</div><div class="label">班级人数</div></div>
+                        <div class="stat-card"><div class="number">{{ classData.avg_score }}</div><div class="label">平均分</div></div>
                     </div>
-                    <div id="classExamChart" class="chart-container"></div>
-                    <h3 style="margin-top: 30px; margin-bottom: 15px;"><span>馃搵</span> 瀛︾敓鍒楄〃</h3>
-                    <div style="margin-bottom: 10px; color: #666; font-size: 0.9em;">
-                        鏄剧ず {{ classSelectedSemesters.length }}/{{ classAvailableSemesters.length }} 涓鏈熺殑鏁版嵁锛屽叡 {{ classData.students?.length || 0 }} 浣嶅悓瀛?
-                    </div>
-                    <table><thead><tr><th>瀛﹀彿</th><th>濮撳悕</th></tr></thead><tbody><tr v-for="student in classData.students" :key="student.student_id"><td>{{ student.student_id }}</td><td>{{ student.student_name }}</td></tr></tbody></table>
-                </div>
-            </div>
-            
-            <div class="bottom-nav no-print">
-                <div class="tabs" style="margin-bottom: 0;">
-                    <button class="tab" :class="{active: currentTab === 'import'}" @click="currentTab = 'import'">馃搧 瀵煎叆</button>
-                    <button class="tab" :class="{active: currentTab === 'overview'}" @click="currentTab = 'overview'">馃搱 姒傝</button>
-                    <button class="tab" :class="{active: currentTab === 'student'}" @click="currentTab = 'student'">馃懅 鑼楀績</button>
-                    <button class="tab" :class="{active: currentTab === 'class'}" @click="currentTab = 'class'">馃彨 鐝骇</button>
                 </div>
             </div>
         </div>
     </div>
     
     <script>
+        const API_BASE = 'https://5fb7-2408-8956-71-1c1d-9183-7145-4b64-6689.ngrok-free.app';
+        
         const { createApp } = Vue;
-        // 浣跨敤鐜鍙橀噺锛堥儴缃叉椂鑷姩鏇挎崲锛夋垨鏈湴鍦板潃
-        const API_BASE = window.location.hostname === 'localhost' 
-            ? 'http://localhost:8808/api' 
-            : (window.API_BASE_URL || '/api');
         
         createApp({
             data() {
                 return {
                     currentTab: 'overview',
-                    dragover: false,
-                    uploading: false,
-                    uploadMessage: '',
-                    uploadSuccess: false,
                     loading: false,
-                    overview: { basic_stats: {}, score_distribution: [] },
+                    overview: {},
                     students: [],
-                    classList: [],
-                    selectedClass: '',
-                    classData: {},
-                    classAvailableSemesters: [],
-                    classSelectedSemesters: [],
-                    classAllScores: [],
+                    classes: [],
                     selectedStudent: '',
                     studentData: {},
-                    printMode: false,
-                    kidsView: true,
-                    totalPoints: 0,
-                    goal: { targetScore: '', reward: '', saved: false },
-                    availableSemesters: [],
-                    selectedSemesters: [],
-                    allScores: [],
-                    achievements: [
-                        { id: 1, name: '馃専 杩涙涔嬫槦', desc: '杩炵画 3 娆¤繘姝?, icon: '猸?, earned: false },
-                        { id: 2, name: '馃摎 瀛︿範杈句汉', desc: '骞冲潎鍒?90+', icon: '馃摉', earned: false },
-                        { id: 3, name: '馃幆 鐩爣杈炬垚', desc: '杈炬垚鑷畾鐩爣', icon: '馃幆', earned: false },
-                        { id: 4, name: '馃挭 鍔姏濂?, desc: '鎴愮哗涓嬮檷浣嗗姫鍔涗簡', icon: '馃挭', earned: false },
-                        { id: 5, name: '馃弮 鍧氭寔濂?, desc: '杩炵画璁板綍 10 娆¤€冭瘯', icon: '馃弲', earned: false }
-                    ]
+                    selectedClass: '',
+                    classData: {}
                 }
             },
             mounted() {
@@ -391,344 +127,75 @@
             },
             methods: {
                 async loadData() {
-                    await this.loadStudents();
-                    await this.loadOverview();
-                },
-                async loadStudents() {
-                    try {
-                        const res = await fetch(`${API_BASE}/students`);
-                        const data = await res.json();
-                        // 鎸夊鍙锋暟瀛楀ぇ灏忔帓搴忥紙杞崲涓烘暣鏁版瘮杈冿級
-                        this.students = data.sort((a, b) => {
-                            // 杞崲涓烘诞鐐规暟鍚庡彇鏁达紝纭繚 "1.0" 鍜?"1" 閮借涓?1
-                            const idA = Math.floor(parseFloat(a.student_id) || 0);
-                            const idB = Math.floor(parseFloat(b.student_id) || 0);
-                            return idA - idB;
-                        });
-                        this.classList = [...new Set(data.map(s => s.class_name).filter(Boolean))];
-                        const mingxin = data.find(s => s.student_name && s.student_name.includes('鑼楀績'));
-                        if (mingxin) {
-                            this.selectedStudent = mingxin.student_id;
-                            // 寤惰繜鍔犺浇纭繚 DOM 灏辩华
-                            setTimeout(() => {
-                                this.loadStudentAnalysis();
-                            }, 500);
-                        }
-                    } catch (e) { console.error('鍔犺浇瀛︾敓澶辫触:', e); }
-                },
-                async loadOverview() {
                     this.loading = true;
                     try {
-                        const res = await fetch(`${API_BASE}/analysis/overview`);
-                        this.overview = await res.json();
-                        console.log('Overview data loaded:', this.overview);
+                        const r = await fetch(`${API_BASE}/students`);
+                        this.students = await r.json();
+                        this.classes = [...new Set(this.students.map(s => s.class_name))];
                         
-                        // 纭繚鏁版嵁鏈夋晥
-                        if (!this.overview.avg_trend) this.overview.avg_trend = [];
-                        if (!this.overview.score_distribution) this.overview.score_distribution = [];
+                        const r2 = await fetch(`${API_BASE}/analysis/overview`);
+                        const data = await r2.json();
+                        this.overview = data.basic_stats;
                         
-                        // 寤惰繜娓叉煋纭繚 DOM 宸插氨缁?
-                        setTimeout(() => {
-                            this.renderAvgTrendChart();
-                            this.renderScoreDistChart();
-                        }, 300);
-                    } catch (e) { 
-                        console.error('鍔犺浇姒傝澶辫触:', e);
-                        alert('鍔犺浇鏁版嵁澶辫触锛岃鍒锋柊椤甸潰閲嶈瘯');
+                        this.$nextTick(() => {
+                            this.renderOverviewChart(data.avg_trend);
+                        });
+                        
+                        const mingxin = this.students.find(s => s.student_name.includes('茗心'));
+                        if (mingxin) {
+                            this.selectedStudent = mingxin.student_id;
+                            this.loadStudentData();
+                        }
+                    } catch (e) {
+                        console.error('加载失败:', e);
+                    } finally {
+                        this.loading = false;
                     }
-                    finally { this.loading = false; }
                 },
-                async loadStudentAnalysis() {
+                async loadStudentData() {
                     if (!this.selectedStudent) return;
                     try {
-                        const res = await fetch(`${API_BASE}/analysis/student/${this.selectedStudent}/trend`);
-                        const data = await res.json();
-                        this.studentData = data;
-                        this.allScores = data.score_trend || [];
-                        
-                        // 鎻愬彇瀛︽湡鍒楄〃
-                        const semesters = [...new Set(this.allScores.map(s => s.semester).filter(Boolean))];
-                        this.availableSemesters = semesters;
-                        this.selectedSemesters = [...semesters]; // 榛樿鍏ㄩ€?
-                        
-                        this.calculateAchievements();
-                        this.$nextTick(() => { 
-                            this.filterBySemester(); // 搴旂敤绛涢€夊苟娓叉煋鍥捐〃
+                        const r = await fetch(`${API_BASE}/analysis/student/${this.selectedStudent}/trend`);
+                        const data = await r.json();
+                        this.studentData = {
+                            student_name: data.student_info.student_name,
+                            avg_score: data.summary.avg_score.toFixed(1),
+                            max_score: data.summary.max_score,
+                            min_score: data.summary.min_score,
+                            scores: data.score_trend
+                        };
+                        this.$nextTick(() => {
+                            this.renderStudentChart(data.score_trend);
                         });
-                    } catch (e) { console.error('鍔犺浇瀛︾敓鍒嗘瀽澶辫触:', e); }
-                },
-                filterBySemester() {
-                    if (this.selectedSemesters.length === 0 || this.selectedSemesters.length === this.availableSemesters.length) {
-                        // 鍏ㄩ€夋垨鍏ㄤ笉閫夋椂鏄剧ず鎵€鏈夋暟鎹?
-                        this.studentData.score_trend = this.allScores;
-                    } else {
-                        // 绛涢€夋樉绀虹殑瀛︽湡
-                        this.studentData.score_trend = this.allScores.filter(s => 
-                            this.selectedSemesters.includes(s.semester)
-                        );
+                    } catch (e) {
+                        console.error('加载学生数据失败:', e);
                     }
-                    this.$nextTick(() => { this.renderStudentTrendChart(); });
                 },
-                selectAllSemesters() {
-                    this.selectedSemesters = [...this.availableSemesters];
-                    this.filterBySemester();
-                },
-                resetSemesters() {
-                    this.selectedSemesters = [...this.availableSemesters];
-                    this.filterBySemester();
-                },
-                async loadClassAnalysis() {
+                async loadClassData() {
                     if (!this.selectedClass) return;
                     try {
-                        const res = await fetch(`${API_BASE}/analysis/class/${encodeURIComponent(this.selectedClass)}`);
-                        this.classData = await res.json();
-                        this.classAllScores = this.classData.all_scores || [];
-                        
-                        // 鎻愬彇瀛︽湡鍒楄〃
-                        const semesters = [...new Set(this.classAllScores.map(s => s.semester).filter(Boolean))];
-                        this.classAvailableSemesters = semesters;
-                        this.classSelectedSemesters = [...semesters]; // 榛樿鍏ㄩ€?
-                        
-                        this.$nextTick(() => { 
-                            this.filterClassBySemester();
-                        });
-                    } catch (e) { console.error('鍔犺浇鐝骇鍒嗘瀽澶辫触:', e); }
-                },
-                filterClassBySemester() {
-                    if (this.classSelectedSemesters.length === 0 || this.classSelectedSemesters.length === this.classAvailableSemesters.length) {
-                        // 鍏ㄩ€夋垨鍏ㄤ笉閫夋椂鏄剧ず鎵€鏈夋暟鎹?
-                        this.classData.all_scores = this.classAllScores;
-                    } else {
-                        // 绛涢€夋樉绀虹殑瀛︽湡
-                        this.classData.all_scores = this.classAllScores.filter(s => 
-                            this.classSelectedSemesters.includes(s.semester)
-                        );
+                        const r = await fetch(`${API_BASE}/analysis/class/${encodeURIComponent(this.selectedClass)}`);
+                        this.classData = await r.json();
+                    } catch (e) {
+                        console.error('加载班级数据失败:', e);
                     }
-                    // 閲嶆柊璁＄畻鑰冭瘯缁熻
-                    this.calculateClassExamStats();
-                    this.$nextTick(() => { this.renderClassExamChart(); });
                 },
-                selectAllClassSemesters() {
-                    this.classSelectedSemesters = [...this.classAvailableSemesters];
-                    this.filterClassBySemester();
-                },
-                resetClassSemesters() {
-                    this.classSelectedSemesters = [...this.classAvailableSemesters];
-                    this.filterClassBySemester();
-                },
-                calculateClassExamStats() {
-                    // 鏍规嵁绛涢€夊悗鐨勬垚缁╅噸鏂拌绠楄€冭瘯缁熻
-                    const scoresByExam = {};
-                    this.classData.all_scores.forEach(score => {
-                        if (!scoresByExam[score.exam_name]) {
-                            scoresByExam[score.exam_name] = [];
-                        }
-                        scoresByExam[score.exam_name].push(score.score);
-                    });
-                    
-                    this.classData.exam_stats = Object.keys(scoresByExam).map(examName => {
-                        const scores = scoresByExam[examName];
-                        return {
-                            exam_name: examName,
-                            exam_date: this.classData.all_scores.find(s => s.exam_name === examName)?.exam_date || '',
-                            avg_score: scores.reduce((a, b) => a + b, 0) / scores.length,
-                            max_score: Math.max(...scores),
-                            min_score: Math.min(...scores),
-                            student_count: scores.length
-                        };
-                    }).sort((a, b) => a.exam_name.localeCompare(b.exam_name));
-                },
-                handleFileSelect(event) { const file = event.target.files[0]; if (file) this.uploadFile(file); },
-                handleDrop(event) { this.dragover = false; const file = event.dataTransfer.files[0]; if (file) this.uploadFile(file); },
-                async uploadFile(file) {
-                    this.uploading = true;
-                    this.uploadMessage = '';
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    try {
-                        const res = await fetch(`${API_BASE}/import/excel`, { method: 'POST', body: formData });
-                        const data = await res.json();
-                        if (res.ok) {
-                            this.uploadSuccess = true;
-                            this.uploadMessage = `鉁?鎴愬姛瀵煎叆 ${data.imported_count} 鏉℃垚缁╄褰曪紒`;
-                            this.loadData();
-                            this.currentTab = 'overview';
-                        } else { throw new Error(data.detail || '瀵煎叆澶辫触'); }
-                    } catch (e) { this.uploadSuccess = false; this.uploadMessage = `鉂?瀵煎叆澶辫触锛?{e.message}`; }
-                    finally { this.uploading = false; }
-                },
-                getTrendClass(change) { if (change === null || change === undefined) return 'trend-stable'; return change > 0 ? 'trend-up' : 'trend-down'; },
-                formatChange(change) { if (change === null || change === undefined) return '-'; return change > 0 ? `+${change.toFixed(1)}` : change.toFixed(1); },
-                getDistEmoji(index) { return ['馃弳', '馃専', '馃摎', '馃挭', '馃幆'][index] || '馃搳'; },
-                getDistColor(index) { return ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444'][index] || '#666'; },
-                calculateAchievements() {
-                    const scores = this.studentData.score_trend || [];
-                    this.achievements.forEach(a => a.earned = false);
-                    if (scores.length === 0) return;
-                    let points = 0, consecutiveImprovements = 0;
-                    for (let i = 1; i < scores.length; i++) {
-                        const change = scores[i].score - scores[i-1].score;
-                        if (change > 0) { consecutiveImprovements++; points += change <= 5 ? 10 : (change <= 10 ? 20 : 50); }
-                        else { consecutiveImprovements = 0; }
-                    }
-                    if (consecutiveImprovements >= 3) { this.achievements[0].earned = true; points += 100; }
-                    if ((this.studentData.summary?.avg_score || 0) >= 90) { this.achievements[1].earned = true; }
-                    if (scores.length >= 10) { this.achievements[4].earned = true; }
-                    this.totalPoints = points;
-                },
-                saveGoal() {
-                    if (!this.goal.targetScore) { alert('璇疯緭鍏ョ洰鏍囧垎鏁板摝锝?馃幆'); return; }
-                    this.goal.saved = true;
-                    const latestScore = this.studentData.score_trend?.[this.studentData.score_trend.length - 1]?.score;
-                    if (latestScore && latestScore >= parseFloat(this.goal.targetScore)) {
-                        this.achievements[2].earned = true;
-                        this.totalPoints += 30;
-                        alert(`馃帀 鎭枩锛佺洰鏍囪揪鎴愶紒鑾峰緱 30 绉垎锛佸鍔憋細${this.goal.reward || '鏈煡'}`);
-                    }
-                    setTimeout(() => { this.goal.saved = false; }, 3000);
-                },
-                renderAvgTrendChart() {
-                    const chartElement = document.getElementById('avgTrendChart');
-                    if (!chartElement) {
-                        console.error('avgTrendChart element not found');
-                        return;
-                    }
-                    
-                    const data = this.overview.avg_trend || [];
-                    console.log('Rendering avg trend chart with', data.length, 'items');
-                    
-                    if (data.length === 0) {
-                        chartElement.innerHTML = '<div style="text-align:center;padding:150px;color:#999;">鏆傛棤鏁版嵁</div>';
-                        return;
-                    }
-                    
-                    const chart = echarts.init(chartElement);
+                renderOverviewChart(data) {
+                    const chart = echarts.init(document.getElementById('avgTrendChart'));
                     chart.setOption({
-                        title: { text: '馃搱 骞冲潎鍒嗚秼鍔?, left: 'center', textStyle: { fontSize: 16 } },
-                        tooltip: { trigger: 'axis' },
-                        xAxis: { type: 'category', data: data.map(d => d.exam_name), axisLabel: { rotate: 45, interval: 0 } },
+                        title: { text: '📈 平均分趋势', left: 'center' },
+                        xAxis: { type: 'category', data: data.map(d => d.exam_name) },
                         yAxis: { type: 'value', min: 0, max: 100 },
-                        grid: { left: '10%', right: '10%', bottom: '15%', top: '15%' },
-                        series: [{ type: 'line', data: data.map(d => d.avg_score), smooth: true, itemStyle: { color: '#FFB6C1' }, areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(255, 182, 193, 0.5)' }, { offset: 1, color: 'rgba(255, 182, 193, 0.1)' }]) } }]
-                    });
-                    
-                    // 鍝嶅簲寮忚皟鏁?
-                    window.addEventListener('resize', () => {
-                        chart.resize();
+                        series: [{ type: 'line', data: data.map(d => d.avg_score), smooth: true, itemStyle: { color: '#FFB6C1' } }]
                     });
                 },
-                renderScoreDistChart() {
-                    const chartElement = document.getElementById('scoreDistChart');
-                    if (!chartElement) {
-                        console.error('scoreDistChart element not found');
-                        return;
-                    }
-                    
-                    const data = this.overview.score_distribution || [];
-                    console.log('Rendering score dist chart with', data.length, 'items');
-                    
-                    if (data.length === 0) {
-                        chartElement.innerHTML = '<div style="text-align:center;padding:150px;color:#999;">鏆傛棤鏁版嵁</div>';
-                        return;
-                    }
-                    
-                    const chart = echarts.init(chartElement);
+                renderStudentChart(data) {
+                    const chart = echarts.init(document.getElementById('studentChart'));
                     chart.setOption({
-                        title: { text: '馃ェ 鍒嗘暟娈靛垎甯?, left: 'center', textStyle: { fontSize: 16 } },
-                        tooltip: { trigger: 'item' },
-                        series: [{ 
-                            type: 'pie', 
-                            radius: ['40%', '70%'],
-                            center: ['50%', '50%'],
-                            data: data.map(d => ({ value: d.count, name: d.level })),
-                            itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
-                            label: { show: true, formatter: '{b}: {c}' }
-                        }]
-                    });
-                    
-                    // 鍝嶅簲寮忚皟鏁?
-                    window.addEventListener('resize', () => {
-                        chart.resize();
-                    });
-                },
-                renderStudentTrendChart() {
-                    const chartElement = document.getElementById('studentTrendChart');
-                    if (!chartElement) {
-                        console.error('studentTrendChart element not found');
-                        return;
-                    }
-                    
-                    const data = this.studentData.score_trend || [];
-                    console.log('Rendering student trend chart with', data.length, 'items');
-                    
-                    if (data.length === 0) {
-                        chartElement.innerHTML = '<div style="text-align:center;padding:150px;color:#999;">鏆傛棤鏁版嵁</div>';
-                        return;
-                    }
-                    
-                    // 閿€姣佹棫鍥捐〃锛堝鏋滄湁锛?
-                    const oldChart = echarts.getInstanceByDom(chartElement);
-                    if (oldChart) {
-                        oldChart.dispose();
-                    }
-                    
-                    const chart = echarts.init(chartElement);
-                    chart.setOption({
-                        title: { text: `馃懅 ${this.studentData.student_info?.student_name} 鐨勬垚缁╄秼鍔縛, left: 'center', textStyle: { fontSize: 16 } },
-                        tooltip: { trigger: 'axis' },
-                        xAxis: { 
-                            type: 'category', 
-                            data: data.map(d => d.exam_name), 
-                            axisLabel: { rotate: 45, interval: 0 },
-                            name: '鑰冭瘯鍚嶇О',
-                            nameLocation: 'middle',
-                            nameGap: 50
-                        },
-                        yAxis: { 
-                            type: 'value', 
-                            min: 0, 
-                            max: 100,
-                            name: '鍒嗘暟'
-                        },
-                        grid: { left: '10%', right: '10%', bottom: '15%', top: '15%' },
-                        series: [{ 
-                            type: 'line', 
-                            data: data.map(d => d.score), 
-                            smooth: true, 
-                            itemStyle: { color: '#87CEEB' },
-                            lineStyle: { width: 3 },
-                            markPoint: {
-                                data: [
-                                    { type: 'max', name: '鏈€楂樺垎' },
-                                    { type: 'min', name: '鏈€浣庡垎' }
-                                ]
-                            },
-                            markLine: {
-                                data: [{ type: 'average', name: '骞冲潎鍒? }]
-                            }
-                        }]
-                    });
-                    
-                    // 鍝嶅簲寮忚皟鏁?
-                    window.addEventListener('resize', () => {
-                        chart.resize();
-                    });
-                    
-                    console.log('Student trend chart rendered successfully');
-                },
-                renderClassExamChart() {
-                    const chart = echarts.init(document.getElementById('classExamChart'));
-                    const data = this.classData.exam_stats || [];
-                    chart.setOption({
-                        title: { text: `${this.classData.class_name} - 鍚勬鑰冭瘯缁熻`, left: 'center', textStyle: { fontSize: 16 } },
-                        tooltip: { trigger: 'axis' },
-                        xAxis: { type: 'category', data: data.map(d => d.exam_name), axisLabel: { rotate: 45 } },
+                        title: { text: `${this.studentData.student_name} 的成绩趋势`, left: 'center' },
+                        xAxis: { type: 'category', data: data.map(d => d.exam_name) },
                         yAxis: { type: 'value', min: 0, max: 100 },
-                        series: [
-                            { type: 'line', name: '骞冲潎鍒?, data: data.map(d => d.avg_score), smooth: true, itemStyle: { color: '#FFB6C1' } },
-                            { type: 'line', name: '鏈€楂樺垎', data: data.map(d => d.max_score), itemStyle: { color: '#98FB98' } },
-                            { type: 'line', name: '鏈€浣庡垎', data: data.map(d => d.min_score), itemStyle: { color: '#FFA07A' } }
-                        ]
+                        series: [{ type: 'line', data: data.map(d => d.score), smooth: true, itemStyle: { color: '#87CEEB' } }]
                     });
                 }
             }
@@ -736,4 +203,3 @@
     </script>
 </body>
 </html>
-
